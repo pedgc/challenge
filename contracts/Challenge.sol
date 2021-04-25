@@ -53,6 +53,11 @@ function setAdmin(address payable _newAdmin) public onlyAdmin {
 }
 // - - - - - - - - - -
 
+// - - - - Events - - - -
+event Winner(string _winner); // Not able to obtain info inside a string
+event Winner1();
+event Winner2();
+
 // - - - - Core - - - -
   function checkUser(address _userAddress, uint _amount) private{
     require(users[_userAddress].userAddress != address(0), "The user does not exists");
@@ -60,9 +65,7 @@ function setAdmin(address payable _newAdmin) public onlyAdmin {
   }
 
   // Deposit and Withdraw for Admin
-  function depositAdmin() public payable onlyAdmin{
-
-  }
+  function depositAdmin() public payable onlyAdmin{}
 
   function withdrawAdmin(uint _amount) public payable onlyAdmin{
     require(address(this).balance >= _amount, "The requested amount is not available");
@@ -80,31 +83,29 @@ function setAdmin(address payable _newAdmin) public onlyAdmin {
   }
 
   function withdraw(uint _amount) public {
-    address payable to = msg.sender;
-    checkUser(to, _amount);
+    checkUser(msg.sender, _amount);
 
-    to.transfer(_amount);
-    users[to].balance -= _amount;
+    msg.sender.transfer(_amount);
+    users[msg.sender].balance -= _amount;
   }
 
 
-  function game(address _pl1, address _pl2, uint _bet, uint _resul) public onlyAdmin returns(string memory){
+  function game(address _pl1, address _pl2, uint _bet, uint _resul) public onlyAdmin{
     checkUser(_pl1, _bet);
     checkUser(_pl2, _bet);
-    string memory winner;
 
     if ((_resul % 2) == 0){
       users[_pl1].balance += _bet;
       users[_pl2].balance -= _bet;
-      winner = "Player 1";
+      emit Winner("Player 1");
+      //emit Winner1();
     }
     else{
       users[_pl2].balance += _bet;
       users[_pl1].balance -= _bet;
-      winner = "Player 2";
+      emit Winner("Player 2");
+      //emit Winner2();
     }
-
-    return winner;
   }
 
 // - - - - - - - - - -
