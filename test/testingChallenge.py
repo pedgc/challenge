@@ -8,7 +8,7 @@ import time
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0xc7c4cF999Cb9503F3de522cBA608331F302f9617'
+CONTRACT_ADDR = '0x9859Ea993261f609E4CaF1f2dF1DC1D9FE157Cde'
 ABI_JSON = '../build/contracts/Challenge.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 
@@ -45,11 +45,13 @@ def main():
     init(autoreset=True)
     print(Back.GREEN +"\n")
 
-    # = = = = = = CONTRACT & EVENTS = = = = = = =
+    # = = = = = = CONTRACT & EVENTS = = = = = = = =
 
     #- - - - - Listen to Events in Thread - - - -
     block_filter = w3.eth.filter({'fromBlock':'latest', "address": CONTRACT_ADDR})
-    worker = Thread(target=log_loop, args=(block_filter, POLL_INTERVAL), daemon=True)
+    event_filter = WINNER_EVENT.createFilter(fromBlock='latest')
+    # worker = Thread(target=log_loop, args=(block_filter, POLL_INTERVAL), daemon=True)
+    worker = Thread(target=log_loop, args=(event_filter, POLL_INTERVAL), daemon=True)
     worker.start()
 
     #- - - - - - Printing - - - - - -
@@ -57,105 +59,122 @@ def main():
     print("Connected to Contract: "+ BLUE +str(w3.isConnected()))
     #print("Info of the ABI:\n"+ BLUE +str(abi))
 
-    # = = = = = = = = = = = TRANSACTIONS = = = = = = = = = =
-    #- - - - - Variables - - - - -
-    accounts = w3.eth.accounts
-    deposit_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[4],
-        'value': w3.toWei(2, 'ether')
-        }
-    depositAdmin_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[0],
-        'value': w3.toWei(3, 'ether')
-        }
+    # # = = = = = = = = = = = TRANSACTIONS = = = = = = = = = =
+    # #- - - - - Variables - - - - -
+    # accounts = w3.eth.accounts
+    # deposit_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[4],
+    #     'value': w3.toWei(2, 'ether')
+    #     }
+    # depositAdmin_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[0],
+    #     'value': w3.toWei(3, 'ether')
+    #     }
+    #
+    # withdraw_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[4],
+    #     }
+    # withdrawAdmin_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[0],
+    #     }
+    #
+    # #- - - - - Deposits - - - - -
+    # tx_hash_deposit = contract.functions.deposit().transact(deposit_trans)
+    # tx_info_deposit = w3.eth.getTransaction(tx_hash_deposit)
+    # tx_hash_depositAdmin = contract.functions.depositAdmin().transact(depositAdmin_trans)
+    # tx_info_depositAdmin = w3.eth.getTransaction(tx_hash_depositAdmin)
+    #
+    # #- - - - - Withdraw() - - - - -
+    # tx_hash_withdraw = contract.functions.withdraw(w3.toWei(1, 'ether')).transact(withdraw_trans)
+    # tx_info_withdraw = w3.eth.getTransaction(tx_hash_withdraw)
+    # tx_hash_withdrawAdmin = contract.functions.withdrawAdmin(w3.toWei(1, 'ether')).transact(withdrawAdmin_trans)
+    # tx_info_withdrawAdmin = w3.eth.getTransaction(tx_hash_withdrawAdmin)
+    #
+    # #- - - - - getUser() - - - - -
+    # user = contract.functions.getUser(accounts[4]).call()
+    #
+    # #- - - - - getBalanceContract() - - - - -
+    # contractBalance = contract.functions.getBalanceContract().call()
+    #
+    # #- - - - - - Printing - - - - - -
+    # print(TITLE + "\n\t\tTRANSACTIONS")
+    # print("Info of the user deposit:\n"+ BLUE +str(tx_info_deposit))
+    # print("Info of the user withdraw:\n"+ BLUE +str(tx_info_withdraw))
+    # print("Info of the User: "+ BLUE +str(user))
+    # print("Info of the Admin deposit:\n"+ BLUE +str(tx_info_depositAdmin))
+    # print("Info of the Admin withdraw:\n"+ BLUE +str(tx_info_withdrawAdmin))
+    # print("Contract Balance: "+ BLUE +str(contractBalance))
+    #
+    # # = = = = = = = = = = = GAME = = = = = = = = = =
+    # #- - - - Variables - - - - -
+    # player1 = accounts[2]
+    # player2 = accounts[3]
+    # admin = accounts[0]
+    # bet = w3.toWei(1, 'ether')
+    # adminVoidTx = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': admin,
+    #     'value': 0
+    # }
+    #
+    # #- - - - Player 1 Deposit - - - -
+    # pl1_deposit_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': player1,
+    #     'value': bet
+    #     }
+    # contract.functions.deposit().transact(pl1_deposit_trans)
+    #
+    # #- - - - Player 2 Deposit - - - -
+    # pl2_deposit_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': player2,
+    #     'value': bet
+    #     }
+    # contract.functions.deposit().transact(pl2_deposit_trans)
+    #
+    # #- - - - Resul & game() - - - -
+    # resul = random.randint(1, 20)
+    # winner = contract.functions.game(player1, player2, bet, resul).transact(adminVoidTx)
+    # pl1_balance = contract.functions.getBalance(player1).call()
+    # pl2_balance = contract.functions.getBalance(player2).call()
+    # contractBalance = contract.functions.getBalanceContract().call()
+    #
+    # #- - - - - - Printing - - - - - -
+    # print(TITLE + "\n\t\tGAME")
+    # print("Game Input:\n\t"+ BLUE +"Bet: "+str(bet)+"\n\tResul: "+str(resul))
+    # print("Game Output:\n\t"+ BLUE +"Winner: "+str(winner.hex())+"\n\tPlayer 1 Balance: "+str(pl1_balance)+"\n\tPlayer 2 Balance: "+str(pl2_balance))
+    # print("Contract Balance: "+ BLUE +str(contractBalance))
+    # time.sleep(POLL_INTERVAL + 1)
 
-    withdraw_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[4],
-        }
-    withdrawAdmin_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[0],
-        }
 
-    #- - - - - Deposits - - - - -
-    tx_hash_deposit = contract.functions.deposit().transact(deposit_trans)
-    tx_info_deposit = w3.eth.getTransaction(tx_hash_deposit)
-    tx_hash_depositAdmin = contract.functions.depositAdmin().transact(depositAdmin_trans)
-    tx_info_depositAdmin = w3.eth.getTransaction(tx_hash_depositAdmin)
+    # = = = = = = = = = = = TESTING FUNCTIONS = = = = = = = = = =
+    str1 = "asd"
+    str2 = "asd"
+    str3 = "222"
+    levDistance = contract.functions.levDistance(str1, str2).call()
+    # compareBytes = contract.functions.compareBytes(str1, str2).call()
+    # compareBytes2 = contract.functions.compareBytes(str1, str3).call()
+    test1 = contract.functions.minimum(2, 2, 2).call()
+    test2 = contract.functions.minimum(3, 7, 5).call()
+    test3 = contract.functions.minimum(10, 11, 12).call()
 
-    #- - - - - Withdraw() - - - - -
-    tx_hash_withdraw = contract.functions.withdraw(w3.toWei(1, 'ether')).transact(withdraw_trans)
-    tx_info_withdraw = w3.eth.getTransaction(tx_hash_withdraw)
-    tx_hash_withdrawAdmin = contract.functions.withdrawAdmin(w3.toWei(1, 'ether')).transact(withdrawAdmin_trans)
-    tx_info_withdrawAdmin = w3.eth.getTransaction(tx_hash_withdrawAdmin)
-
-    #- - - - - getUser() - - - - -
-    user = contract.functions.getUser(accounts[4]).call()
-
-    #- - - - - getBalanceContract() - - - - -
-    contractBalance = contract.functions.getBalanceContract().call()
-
-    #- - - - - - Printing - - - - - -
-    print(TITLE + "\n\t\tTRANSACTIONS")
-    print("Info of the user deposit:\n"+ BLUE +str(tx_info_deposit))
-    print("Info of the user withdraw:\n"+ BLUE +str(tx_info_withdraw))
-    print("Info of the User: "+ BLUE +str(user))
-    print("Info of the Admin deposit:\n"+ BLUE +str(tx_info_depositAdmin))
-    print("Info of the Admin withdraw:\n"+ BLUE +str(tx_info_withdrawAdmin))
-    print("Contract Balance: "+ BLUE +str(contractBalance))
-
-    # = = = = = = = = = = = GAME = = = = = = = = = =
-    #- - - - Variables - - - - -
-    player1 = accounts[2]
-    player2 = accounts[3]
-    admin = accounts[0]
-    bet = w3.toWei(1, 'ether')
-    adminVoidTx = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': admin,
-        'value': 0
-    }
-
-    #- - - - Player 1 Deposit - - - -
-    pl1_deposit_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': player1,
-        'value': bet
-        }
-    contract.functions.deposit().transact(pl1_deposit_trans)
-
-    #- - - - Player 2 Deposit - - - -
-    pl2_deposit_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': player2,
-        'value': bet
-        }
-    contract.functions.deposit().transact(pl2_deposit_trans)
-
-    #- - - - Resul & game() - - - -
-    resul = random.randint(1, 20)
-    winner = contract.functions.game(player1, player2, bet, resul).transact(adminVoidTx)
-    pl1_balance = contract.functions.getBalance(player1).call()
-    pl2_balance = contract.functions.getBalance(player2).call()
-    contractBalance = contract.functions.getBalanceContract().call()
-
-    #- - - - - - Printing - - - - - -
-    print(TITLE + "\n\t\tGAME")
-    print("Game Input:\n\t"+ BLUE +"Bet: "+str(bet)+"\n\tResul: "+str(resul))
-    print("Game Output:\n\t"+ BLUE +"Winner: "+str(winner.hex())+"\n\tPlayer 1 Balance: "+str(pl1_balance)+"\n\tPlayer 2 Balance: "+str(pl2_balance))
-    print("Contract Balance: "+ BLUE +str(contractBalance))
-
-    time.sleep(POLL_INTERVAL + 1)
+    print(TITLE + "\n\t\tTESTING FUNCTIONS")
+    print("Lev Distance: "+ BLUE +str(levDistance))
+    # print("Compare Bytes:\n\t"+ BLUE +"1: "+str(compareBytes)+" || 2: "+str(compareBytes2))
+    print("Real Length:\n\t"+ BLUE +"str1: "+str(len(str1))+" || str2: "+str(len(str2)))
+    print("Minimum:\n\t"+ BLUE +"test1: "+str(test1)+" || test2: "+str(test2)+" || test3: "+str(test3))
 
 if __name__ == '__main__':
     main()

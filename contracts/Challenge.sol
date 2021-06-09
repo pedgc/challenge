@@ -4,10 +4,13 @@ contract Challenge {
 
   /* = = = = = = TO DO = = = = = = = */
   /*
-    - Learn how to optimize gas costs
-    - Modify functions to avoid unnecesary calls to admin account
-      - Also create a withdraw to admin account
+    * Learn how to optimize gas costs
+    * See how to "froze" the money while betting
+    * Calculate the levenshtein distance
+      - Check how to calculate the string.length
+    * Transform this into a modular architecture
   */
+
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
   //State variables -> Permanently saved in the contract
   address payable public admin;
@@ -109,5 +112,80 @@ event Winner2();
   }
 
 // - - - - - - - - - -
+
+// - - - - Testing Functions - - - -
+  function levDistance(string memory _str1, string memory _str2) public pure returns(uint){
+    uint length1 = bytes(_str1).length;
+    uint length2 = bytes(_str2).length;
+    uint dim1 = length1+1;
+    uint dim2 = length2+1;
+    uint n = max(dim1, dim2);
+    //uint[2][] memory distance = new uint[2][](n);
+    uint[10][] memory distance = new uint[10][](n);
+    bytes memory str1 = bytes(_str1);
+    bytes memory str2 = bytes(_str2);
+
+    for(uint i=0; i<=length1; i++){
+      distance[i][0]=i;
+    }
+    for(uint j=0; j<=length2; j++){
+      distance[0][j]=j;
+    }
+    for(uint i=1; i<=length1; i++){
+      for(uint j=1; j<=length2; j++){
+        uint aux = 1;
+        if (str1[i-1] == str2[j-1]){
+          aux = 0;
+        }
+        distance[i][j]= minimum(distance[i-1][j] + 1, distance[i][j-1] + 1, distance[i-1][j-1] + aux);
+      }
+    }
+
+    uint resul = distance[length1][length2];
+    return (resul);
+  }
+
+  function minimum(uint a, uint b, uint c) public pure returns (uint){
+    uint smallest;
+    if (a <= b && a <= c) {
+      smallest = a;
+    } else if (b <= c && b <= a) {
+      smallest = b;
+    } else {
+      smallest = c;
+    }
+
+    return (smallest);
+  }
+
+  function max(uint a, uint b) public pure returns (uint){
+    uint resul;
+
+    if(b > a){
+      resul = b;
+    } else {
+      resul = a;
+    }
+
+    return (resul);
+  }
+  // function compareBytes(string memory _str1, string memory _str2) public returns (string memory, uint){
+  //   bytes memory str1 = bytes(_str1);
+  //   bytes memory str2 = bytes(_str2);
+  //   string memory resul = "diferentes";
+  //   uint aux = 1;
+  //   // uint[1][1] memory distance; // This one works
+  //   uint[1][] memory distance;
+  //
+  //   if (str2[1+aux] == str1[aux+1]){
+  //     resul = "iguales";
+  //   }
+  //
+  //   // distance[0][0] = aux; // This one works
+  //   distance[0] = [aux];
+  //
+  //   return (resul, distance[0]);
+  //
+  // }
 
 }
