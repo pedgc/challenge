@@ -3,13 +3,16 @@ from web3.logs import STRICT, IGNORE, DISCARD, WARN
 from colorama import Fore, Back, init #,Style
 import json
 import random
+import binascii
 from threading import Thread
 import time
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0x9EB38d11Cdf7ddddba6F225CA685B95614AdC106'
+CONTRACT_ADDR = '0x39430cA4cf6687F7ac5495Fc869D1C2edC6Dec8b'
+LEVDIST_CONTRACT_ADDR = "0xd8e7f1c55c75E3c10aF592e641fa359a2Ecfe043"
 ABI_JSON = '../build/contracts/Challenge.json'
+ABI_JSON_LEVDIST = '../build/contracts/LevDistance.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 
 #- - - - Pretty Print variables - - - -
@@ -18,6 +21,15 @@ BLUE = Fore.BLUE
 EVENT = Fore.YELLOW
 
 #- - - - - Connection to Blockchain & Contract - - - - -
+# LevDistance Contract
+with open(ABI_JSON_LEVDIST) as json_file_lev:
+    info_json_lev = json.load(json_file_lev)
+abi_lev = info_json_lev["abi"]
+w3_lev = Web3(Web3.HTTPProvider(NODE_HTTP))
+contract_lev = w3_lev.eth.contract(address=LEVDIST_CONTRACT_ADDR, abi=abi_lev)
+levConAddressParsed = contract_lev.address
+
+# Challenge Contract
 with open(ABI_JSON) as json_file:
     info_json = json.load(json_file)
 abi = info_json["abi"]
@@ -26,8 +38,8 @@ contract = w3.eth.contract(address=CONTRACT_ADDR, abi=abi)
 
 # = = = = EVENTS = = = =
 WINNER_EVENT = contract.events.Winner()   # Needs to be instanciated due to Web3py limitations
-WINNER1_EVENT = contract.events.Winner1() # Needs to be instanciated due to Web3py limitations
-WINNER2_EVENT = contract.events.Winner2() # Needs to be instanciated due to Web3py limitations
+# WINNER1_EVENT = contract.events.Winner1() # Needs to be instanciated due to Web3py limitations
+# WINNER2_EVENT = contract.events.Winner2() # Needs to be instanciated due to Web3py limitations
 
 def handle_event(event):
     receipt = w3.eth.wait_for_transaction_receipt(event['transactionHash'])
@@ -54,109 +66,109 @@ def main():
     worker = Thread(target=log_loop, args=(event_filter, POLL_INTERVAL), daemon=True)
     worker.start()
 
-    #- - - - - - Printing - - - - - -
-    print(TITLE + "\n\t\tINITIAL TESTS")
-    print("Connected to Contract: "+ BLUE +str(w3.isConnected()))
-    #print("Info of the ABI:\n"+ BLUE +str(abi))
-
-    # = = = = = = = = = = = TRANSACTIONS = = = = = = = = = =
-    #- - - - - Variables - - - - -
+    # #- - - - - - Printing - - - - - -
+    # print(TITLE + "\n\t\tINITIAL TESTS")
+    # print("Connected to Contract: "+ BLUE +str(w3.isConnected()))
+    # #print("Info of the ABI:\n"+ BLUE +str(abi))
+    #
+    # # = = = = = = = = = = = TRANSACTIONS = = = = = = = = = =
+    # #- - - - - Variables - - - - -
     accounts = w3.eth.accounts
-    deposit_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[4],
-        'value': w3.toWei(2, 'ether')
-        }
-    depositAdmin_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[0],
-        'value': w3.toWei(3, 'ether')
-        }
-
-    withdraw_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[4],
-        }
-    withdrawAdmin_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': accounts[0],
-        }
-
-    #- - - - - Deposits - - - - -
-    tx_hash_deposit = contract.functions.deposit().transact(deposit_trans)
-    tx_info_deposit = w3.eth.getTransaction(tx_hash_deposit)
-    tx_hash_depositAdmin = contract.functions.depositAdmin().transact(depositAdmin_trans)
-    tx_info_depositAdmin = w3.eth.getTransaction(tx_hash_depositAdmin)
-
-    #- - - - - Withdraw() - - - - -
-    tx_hash_withdraw = contract.functions.withdraw(w3.toWei(1, 'ether')).transact(withdraw_trans)
-    tx_info_withdraw = w3.eth.getTransaction(tx_hash_withdraw)
-    tx_hash_withdrawAdmin = contract.functions.withdrawAdmin(w3.toWei(1, 'ether')).transact(withdrawAdmin_trans)
-    tx_info_withdrawAdmin = w3.eth.getTransaction(tx_hash_withdrawAdmin)
-
-    #- - - - - getUser() - - - - -
-    user = contract.functions.getUser(accounts[4]).call()
-
-    #- - - - - getBalanceContract() - - - - -
-    contractBalance = contract.functions.getBalanceContract().call()
-
-    #- - - - - - Printing - - - - - -
-    print(TITLE + "\n\t\tTRANSACTIONS")
-    print("Info of the user deposit:\n"+ BLUE +str(tx_info_deposit))
-    print("Info of the user withdraw:\n"+ BLUE +str(tx_info_withdraw))
-    print("Info of the User: "+ BLUE +str(user))
-    print("Info of the Admin deposit:\n"+ BLUE +str(tx_info_depositAdmin))
-    print("Info of the Admin withdraw:\n"+ BLUE +str(tx_info_withdrawAdmin))
-    print("Contract Balance: "+ BLUE +str(contractBalance))
-
-    # = = = = = = = = = = = GAME = = = = = = = = = =
-    #- - - - Variables - - - - -
-    player1 = accounts[2]
-    player2 = accounts[3]
-    admin = accounts[0]
-    bet = w3.toWei(1, 'ether')
-    adminVoidTx = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': admin,
-        'value': 0
-    }
-
-    #- - - - Player 1 Deposit - - - -
-    pl1_deposit_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': player1,
-        'value': bet
-        }
-    contract.functions.deposit().transact(pl1_deposit_trans)
-
-    #- - - - Player 2 Deposit - - - -
-    pl2_deposit_trans = {
-        'gas': 420000,
-        'gasPrice': 21000,
-        'from': player2,
-        'value': bet
-        }
-    contract.functions.deposit().transact(pl2_deposit_trans)
-
-    #- - - - Resul & game() - - - -
-    resul = random.randint(1, 20)
-    winner = contract.functions.game(player1, player2, bet, resul).transact(adminVoidTx)
-    pl1_balance = contract.functions.getBalance(player1).call()
-    pl2_balance = contract.functions.getBalance(player2).call()
-    contractBalance = contract.functions.getBalanceContract().call()
-
-    #- - - - - - Printing - - - - - -
-    print(TITLE + "\n\t\tGAME")
-    print("Game Input:\n\t"+ BLUE +"Bet: "+str(bet)+"\n\tResul: "+str(resul))
-    print("Game Output:\n\t"+ BLUE +"Winner: "+str(winner.hex())+"\n\tPlayer 1 Balance: "+str(pl1_balance)+"\n\tPlayer 2 Balance: "+str(pl2_balance))
-    print("Contract Balance: "+ BLUE +str(contractBalance))
-    time.sleep(POLL_INTERVAL + 1)
+    # deposit_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[4],
+    #     'value': w3.toWei(2, 'ether')
+    #     }
+    # depositAdmin_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[0],
+    #     'value': w3.toWei(3, 'ether')
+    #     }
+    #
+    # withdraw_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[4],
+    #     }
+    # withdrawAdmin_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': accounts[0],
+    #     }
+    #
+    # #- - - - - Deposits - - - - -
+    # tx_hash_deposit = contract.functions.deposit().transact(deposit_trans)
+    # tx_info_deposit = w3.eth.getTransaction(tx_hash_deposit)
+    # tx_hash_depositAdmin = contract.functions.depositAdmin().transact(depositAdmin_trans)
+    # tx_info_depositAdmin = w3.eth.getTransaction(tx_hash_depositAdmin)
+    #
+    # #- - - - - Withdraw() - - - - -
+    # tx_hash_withdraw = contract.functions.withdraw(w3.toWei(1, 'ether')).transact(withdraw_trans)
+    # tx_info_withdraw = w3.eth.getTransaction(tx_hash_withdraw)
+    # tx_hash_withdrawAdmin = contract.functions.withdrawAdmin(w3.toWei(1, 'ether')).transact(withdrawAdmin_trans)
+    # tx_info_withdrawAdmin = w3.eth.getTransaction(tx_hash_withdrawAdmin)
+    #
+    # #- - - - - getUser() - - - - -
+    # user = contract.functions.getUser(accounts[4]).call()
+    #
+    # #- - - - - getBalanceContract() - - - - -
+    # contractBalance = contract.functions.getBalanceContract().call()
+    #
+    # #- - - - - - Printing - - - - - -
+    # print(TITLE + "\n\t\tTRANSACTIONS")
+    # print("Info of the user deposit:\n"+ BLUE +str(tx_info_deposit))
+    # print("Info of the user withdraw:\n"+ BLUE +str(tx_info_withdraw))
+    # print("Info of the User: "+ BLUE +str(user))
+    # print("Info of the Admin deposit:\n"+ BLUE +str(tx_info_depositAdmin))
+    # print("Info of the Admin withdraw:\n"+ BLUE +str(tx_info_withdrawAdmin))
+    # print("Contract Balance: "+ BLUE +str(contractBalance))
+    #
+    # # = = = = = = = = = = = GAME = = = = = = = = = =
+    # #- - - - Variables - - - - -
+    # player1 = accounts[2]
+    # player2 = accounts[3]
+    # admin = accounts[0]
+    # bet = w3.toWei(1, 'ether')
+    # adminVoidTx = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': admin,
+    #     'value': 0
+    # }
+    #
+    # #- - - - Player 1 Deposit - - - -
+    # pl1_deposit_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': player1,
+    #     'value': bet
+    #     }
+    # contract.functions.deposit().transact(pl1_deposit_trans)
+    #
+    # #- - - - Player 2 Deposit - - - -
+    # pl2_deposit_trans = {
+    #     'gas': 420000,
+    #     'gasPrice': 21000,
+    #     'from': player2,
+    #     'value': bet
+    #     }
+    # contract.functions.deposit().transact(pl2_deposit_trans)
+    #
+    # #- - - - Resul & game() - - - -
+    # resul = random.randint(1, 20)
+    # winner = contract.functions.game(player1, player2, bet, resul).transact(adminVoidTx)
+    # pl1_balance = contract.functions.getBalance(player1).call()
+    # pl2_balance = contract.functions.getBalance(player2).call()
+    # contractBalance = contract.functions.getBalanceContract().call()
+    #
+    # #- - - - - - Printing - - - - - -
+    # print(TITLE + "\n\t\tGAME")
+    # print("Game Input:\n\t"+ BLUE +"Bet: "+str(bet)+"\n\tResul: "+str(resul))
+    # print("Game Output:\n\t"+ BLUE +"Winner: "+str(winner.hex())+"\n\tPlayer 1 Balance: "+str(pl1_balance)+"\n\tPlayer 2 Balance: "+str(pl2_balance))
+    # print("Contract Balance: "+ BLUE +str(contractBalance))
+    # time.sleep(POLL_INTERVAL + 1)
 
 
     # = = = = = = = = = = = LEV DISTANCE = = = = = = = = = =
@@ -172,8 +184,8 @@ def main():
     player2 = accounts[3]
     admin = accounts[0]
     bet = w3.toWei(1, 'ether')
-    adminVoidTx = {
-        'gas': 420000,
+    adminVoidTx2 = {
+        'gas': 300000000,
         'gasPrice': 21000,
         'from': admin,
         'value': 0
@@ -197,11 +209,16 @@ def main():
         }
     contract.functions.deposit().transact(pl2_deposit_trans)
 
+    #- - - - Setting Up LevDistance Contract - - - - -
+    # contract.functions.setContract("levDistance", bytes.fromhex(LEVDIST_CONTRACT_ADDR[2:])).call()
+    contract.functions.setContract("levDistance", LEVDIST_CONTRACT_ADDR).transact(adminVoidTx2)
+    addresss = contract.functions.getContractAddr("levDistance").call()
+
     #- - - - Resul & game() - - - -
     resul = "Skullcandy";
     player1_resul = "Skulcandy";
     player2_resul = "Skulcandi";
-    winner = contract.functions.gameLev(player1, player2, bet, player1_resul, player2_resul, resul).transact(adminVoidTx)
+    winner = contract.functions.gameLev(player1, player2, bet, player1_resul, player2_resul, resul, "levDistance").transact(adminVoidTx2)
     pl1_balance = contract.functions.getBalance(player1).call()
     pl2_balance = contract.functions.getBalance(player2).call()
     contractBalance = contract.functions.getBalanceContract().call()
@@ -213,10 +230,17 @@ def main():
     # print("asd & 222: "+ BLUE +str(contract.functions.levDistance(str1, str3).call()))
     # print("123 & 222: "+ BLUE +str(contract.functions.levDistance(str5, str3).call()))
     # print("223 & 222: "+ BLUE +str(contract.functions.levDistance(str6, str3).call()))
+
     print("Game Input:\n\t"+ BLUE +"Bet: "+str(bet)+"\n\tResul: "+str(resul))
     print("Game Output:\n\t"+ BLUE +"Winner: "+str(winner.hex())+"\n\tPlayer 1 Balance: "+str(pl1_balance)+"\n\tPlayer 2 Balance: "+str(pl2_balance))
     print("Contract Balance: "+ BLUE +str(contractBalance))
     time.sleep(POLL_INTERVAL + 1)
+
+    print("LEVDIST_CONTRACT_ADDR:"+ BLUE +" "+str(LEVDIST_CONTRACT_ADDR))
+    print("LEVDIST_CONTRACT_ADDR[2:]:"+ BLUE +" "+str(LEVDIST_CONTRACT_ADDR[2:]))
+    print("levConAddressParsed:"+ BLUE +" "+levConAddressParsed)
+    print("levConAddressParsed to hex:"+ BLUE +" "+Web3.toHex(text=levConAddressParsed))
+    print("addresss:"+ BLUE +" "+addresss)
 
 
 if __name__ == '__main__':

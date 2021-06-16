@@ -3,7 +3,9 @@
 //   how to interact with the contract including its variables, functions and
 //   their parameters.
 var Challenge = artifacts.require("Challenge");
+var LevDistance = artifacts.require("LevDistance");
 
 module.exports = function(deployer) {
   deployer.deploy(Challenge);
+  // deployer.deploy(LevDistance);
 };

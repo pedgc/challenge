@@ -4,7 +4,7 @@ contract LevDistance {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
   //State variables -> Permanently saved in the contract
-  address payable public admin;
+  address public admin;
 
   constructor () public{
     admin = msg.sender;
@@ -21,7 +21,7 @@ contract LevDistance {
 // - - - - - - - - - -
 
 // - - - - Future Modifications - - - -
-function setAdmin(address payable _newAdmin) public onlyAdmin {
+function setAdmin(address _newAdmin) public onlyAdmin {
   admin = _newAdmin;
 }
 // - - - - - - - - - -
@@ -30,11 +30,11 @@ function setAdmin(address payable _newAdmin) public onlyAdmin {
 
 // - - - - Core - - - -
 
-  function levDistance(string memory _str1, string memory _str2) public view onlyAdmin returns(uint){
+  function levDistance(string memory _str1, string memory _str2) public payable returns(uint){
     uint length1 = bytes(_str1).length;
     uint length2 = bytes(_str2).length;
     uint n = max(length1, length2) + 1;
-    uint[10][] memory distance = new uint[10][](n);
+    uint[20][] memory distance = new uint[20][](n);
     bytes memory str1 = bytes(_str1);
     bytes memory str2 = bytes(_str2);
 
@@ -55,6 +55,8 @@ function setAdmin(address payable _newAdmin) public onlyAdmin {
     }
 
     return (distance[length1][length2]);
+    // uint a = 1;
+    // return a;
   }
 
   function minimum(uint a, uint b, uint c) private pure returns (uint){
