@@ -4,7 +4,11 @@ contract LevDistance {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
   //State variables -> Permanently saved in the contract
-  address public admin;
+  string private solution;
+  address private admin;
+  address private winner;
+  address[] private contesters;
+  mapping(address => uint256) public users;
 
   constructor () public{
     admin = msg.sender;
@@ -16,21 +20,32 @@ contract LevDistance {
   }
 
 /* = = = = = = = FUNCTIONS = = = = = = = */
-// - - - - Getters - - - -
-
-// - - - - - - - - - -
-
-// - - - - Future Modifications - - - -
+// - - - - Getters & Setters - - - -
 function setAdmin(address _newAdmin) public onlyAdmin {
   admin = _newAdmin;
 }
-// - - - - - - - - - -
+function setSolution(string memory _solution) public onlyAdmin{
+  solution = _solution;
+}
+
+function getSolution() public onlyAdmin returns(string memory){
+  return solution;
+}
+
+// - - - - - - - - - - - - - - - - -
 
 // - - - - Events - - - -
+event Winner(string _winner);
 
-// - - - - Core - - - -
+// - - - - - - - - - -
 
-  function levDistance(string memory _str1, string memory _str2) public payable returns(uint){
+// - - - - Participants - - - -
+  function contest(string memory _resul) public{
+    users[msg.sender] = levDistance(_resul, solution);
+    contesters.push(msg.sender);
+  }
+
+  function levDistance(string memory _str1, string memory _str2) private pure returns(uint256){
     uint length1 = bytes(_str1).length;
     uint length2 = bytes(_str2).length;
     uint n = max(length1, length2) + 1;
@@ -54,9 +69,7 @@ function setAdmin(address _newAdmin) public onlyAdmin {
       }
     }
 
-    return (distance[length1][length2]);
-    // uint a = 1;
-    // return a;
+    return (uint256(distance[length1][length2]));
   }
 
   function minimum(uint a, uint b, uint c) private pure returns (uint){
@@ -82,5 +95,25 @@ function setAdmin(address _newAdmin) public onlyAdmin {
     }
 
     return (resul);
+  }
+
+// - - - - - - - Winner & prize - - - - - - - -
+  function setWinner() public onlyAdmin{
+    uint min = users[contesters[0]];
+    address _winner = contesters[0];
+    uint256 i;
+
+    for(i = 1; i < contesters.length; i++){
+        if(users[contesters[i]] < min) {
+            min = users[contesters[i]];
+            _winner = contesters[i];
+        }
+    }
+
+    winner = _winner;
+  }
+
+  function getWinner() public view onlyAdmin returns(address){
+    return winner;
   }
 }

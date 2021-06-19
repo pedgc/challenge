@@ -6,6 +6,6 @@ var Challenge = artifacts.require("Challenge");
 var LevDistance = artifacts.require("LevDistance");
 
 module.exports = function(deployer) {
-  deployer.deploy(Challenge);
-  // deployer.deploy(LevDistance);
+  // deployer.deploy(Challenge);
+  deployer.deploy(LevDistance);
 };
