@@ -9,7 +9,7 @@ import time
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0x866679C0BFbc4521b2F15422137F208e83f95379'
+CONTRACT_ADDR = '0xf14B4527b1515e2A9CA0baB16CFdee04e3F0EF75'
 ABI_JSON = '../build/contracts/LevDistance.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 
@@ -64,6 +64,12 @@ def main():
     player4 = accounts[5]
     admin = accounts[0]
 
+    adminPrizeTx = {
+        'gas': 300000000,
+        'gasPrice': 21000,
+        'from': admin,
+        'value': w3.toWei(3, 'ether')
+    }
     adminVoidTx = {
         'gas': 300000000,
         'gasPrice': 21000,
@@ -97,14 +103,16 @@ def main():
 
     # Contest Solutions & Resul
     solution = "Skullcandy"
-    pl1_resul = "Skullcandy"
+    pl1_resul = "Skulxcandy"
     pl2_resul = "Skulcandy"
-    pl3_resul = "asfdñlkj"
+    pl3_resul = "Skullcandy"
     pl4_resul = "Skullcandii"
 
-    # Setting Solution
+    # Setting Solution & Prize
     contract.functions.setSolution(solution).transact(adminVoidTx)
     solutionFromContract = contract.functions.getSolution().call()
+    contract.functions.setPrize().transact(adminPrizeTx)
+    prize = contract.functions.getPrize().call()
 
     # Contesters
     contract.functions.contest(pl1_resul).transact(pl1_contest_trans)
@@ -112,19 +120,28 @@ def main():
     contract.functions.contest(pl3_resul).transact(pl3_contest_trans)
     contract.functions.contest(pl4_resul).transact(pl4_contest_trans)
 
-    # Winner
-    contract.functions.setWinner().transact(adminVoidTx)
-    winner = contract.functions.getWinner().call()
+    # Winners
+    contract.functions.calculateWinners().transact(adminVoidTx)
+    winner = contract.functions.getWinners().call()
+
+    # Sending Prize to winners
+    contract.functions.sendPrizeToWinners().transact(adminVoidTx)
+
+    # Deletting contest
+    contract.functions.resetContest().transact(adminVoidTx)
 
     # = = = = = = = = = PRINTING = = = = = = = = =
     print(TITLE + "\n\t\tCONTEST")
     print("Solution:"+ BLUE +" "+str(solution))
     print("Solution from Contract:"+ BLUE +" "+str(solutionFromContract))
+    print("Prize: "+ BLUE +" "+str(prize))
+    print("- - - - - - - - - - - - - -")
     print("Player 1: "+ BLUE +str(player1))
     print("Player 2: "+ BLUE +str(player2))
     print("Player 3: "+ BLUE +str(player3))
     print("Player 4: "+ BLUE +str(player4))
-    print("Winner: "+ BLUE +str(winner))
+    print("- - - - - - - - - - - - - -")
+    print("Winners: "+ BLUE +str(winner))
 
 if __name__ == '__main__':
     main()

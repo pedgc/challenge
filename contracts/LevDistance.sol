@@ -6,12 +6,14 @@ contract LevDistance {
   //State variables -> Permanently saved in the contract
   string private solution;
   address private admin;
-  address private winner;
-  address[] private contesters;
+  address payable[] private winners;
+  address payable[] private contesters;
+  uint prize;
   mapping(address => uint256) public users;
 
   constructor () public{
     admin = msg.sender;
+    prize = 0;
   }
 
   modifier onlyAdmin {
@@ -27,9 +29,22 @@ function setAdmin(address _newAdmin) public onlyAdmin {
 function setSolution(string memory _solution) public onlyAdmin{
   solution = _solution;
 }
+function setPrize() public payable onlyAdmin{
+  require(msg.value > 0, "Prize can not be 0");
+  prize = msg.value;
+}
 
-function getSolution() public onlyAdmin returns(string memory){
+function getAdmin() public view returns(address){
+  return admin;
+}
+function getSolution() public view onlyAdmin returns(string memory){
   return solution;
+}
+function getPrize() public view returns(uint){
+  return prize;
+}
+function getWinners() public view onlyAdmin returns(address payable[] memory){
+  return winners;
 }
 
 // - - - - - - - - - - - - - - - - -
@@ -98,22 +113,47 @@ event Winner(string _winner);
   }
 
 // - - - - - - - Winner & prize - - - - - - - -
-  function setWinner() public onlyAdmin{
+  function calculateWinners() public onlyAdmin{
+    require(contesters.length >= 1, "We should have at least 1 contester");
+
     uint min = users[contesters[0]];
-    address _winner = contesters[0];
     uint256 i;
 
+    // Obtain the minimum score
     for(i = 1; i < contesters.length; i++){
         if(users[contesters[i]] < min) {
             min = users[contesters[i]];
-            _winner = contesters[i];
         }
     }
 
-    winner = _winner;
+    // Obtain all contesters with minimum score
+    for(i = 0; i < contesters.length; i++){
+      if(users[contesters[i]] == min) {
+          winners.push(contesters[i]);
+      }
+    }
+
   }
 
-  function getWinner() public view onlyAdmin returns(address){
-    return winner;
+  function sendPrizeToWinners() public payable onlyAdmin{
+    require(winners.length >= 1, "We should have at least 1 winner");
+
+    uint prizePerWinner = prize/winners.length;
+    uint i;
+
+    for(i = 0; i < winners.length; i++){
+      winners[i].transfer(prizePerWinner);
+    }
+    emit Winner("Finished sending prizes");
   }
+
+  // - - - - - - - Reset Contest - - - - - - - -
+  function resetContest() public onlyAdmin{
+    solution = "";
+    prize = 0;
+    delete winners;
+    delete contesters;
+  }
+
+
 }
