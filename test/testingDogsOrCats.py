@@ -9,8 +9,8 @@ import time
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0xe7d8f720689faa6F6a8c688810d5dc0397C999E5'
-ABI_JSON = '../build/contracts/LevDistance.json'
+CONTRACT_ADDR = '0xAA39b106018F15DEB27A0aD26F4bFE1fE9902767'
+ABI_JSON = '../build/contracts/DogsOrCats.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 
 #- - - - Pretty Print variables - - - -
@@ -77,36 +77,36 @@ def main():
         'value': 0
     }
     pl1_contest_trans = {
-        'gas': 420000,
+        'gas': 300000000,
         'gasPrice': 21000,
         'from': player1,
         'value': 0
     }
     pl2_contest_trans = {
-        'gas': 420000,
+        'gas': 300000000,
         'gasPrice': 21000,
         'from': player2,
         'value': 0
     }
     pl3_contest_trans = {
-        'gas': 420000,
+        'gas': 300000000,
         'gasPrice': 21000,
         'from': player3,
         'value': 0
     }
     pl4_contest_trans = {
-        'gas': 420000,
+        'gas': 300000000,
         'gasPrice': 21000,
         'from': player4,
         'value': 0
     }
 
     # Contest Solutions & Resul
-    solution = "Skullcandy"
-    pl1_resul = "Skullcandy"
-    pl2_resul = "Skulcandy"
-    pl3_resul = "Skullcandy"
-    pl4_resul = "Skullcandii"
+    solution = [1,1,1,1,1]
+    pl1_resul = [1,1,1,1,1]
+    pl2_resul = [1,1,1,1,1]
+    pl3_resul = [1,0,1,0,1]
+    pl4_resul = [1,1,1,1,0]
 
     # Initial Contest Status
     initStatus = contract.functions.getStatus().call()

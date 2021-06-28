@@ -1,10 +1,10 @@
 pragma solidity ^0.5.0;
 
-contract LevDistance {
+contract DogsOrCats {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
   //State variables -> Permanently saved in the contract
-  string private solution;
+  uint[] private solution;
   address private admin;
   address payable[] private winners;
   address payable[] private contesters;
@@ -19,7 +19,7 @@ contract LevDistance {
     prize = 0;
     status = false;
     prizeHasBeenSent = false;
-    name = "Text Reading Contest";
+    name = "Cats or Dogs Contest";
   }
 
   modifier onlyAdmin {
@@ -50,7 +50,7 @@ function setName(string memory _name) public onlyAdmin{
 function getAdmin() public view returns(address){
   return admin;
 }
-function getSolution() public view onlyAdmin returns(string memory){
+function getSolution() public view onlyAdmin returns(uint[] memory){
   return solution;
 }
 function getPrize() public view returns(uint){
@@ -73,7 +73,7 @@ event Notification(string _notif);
 
 // - - - - - Admin - - - - -
 
-  function createContest(string memory _solution) public payable onlyAdmin{
+  function createContest(uint[] memory _solution) public payable onlyAdmin{
     require(msg.value > 0, "Prize can not be 0");
 
     solution = _solution;
@@ -124,7 +124,7 @@ event Notification(string _notif);
   function resetContest() public onlyAdmin{
     require(prizeHasBeenSent == true, "You can not reset the contest without sending prize to winner/s");
 
-    solution = "";
+    delete solution;
     prize = 0;
     delete winners;
     delete contesters;
@@ -135,62 +135,24 @@ event Notification(string _notif);
 
 
 // - - - - Participants - - - -
-  function contest(string memory _resul) public{
-    users[msg.sender] = obtainScore(_resul, solution);
+  function contest(uint[] memory _resul) public{
+    require(_resul.length == solution.length, "The dataset length is not correct");
+    users[msg.sender] = obtainScore(_resul);
     contesters.push(msg.sender);
   }
 
-  //Explain about levehnstein distance
-  function obtainScore(string memory _str1, string memory _str2) private pure returns(uint256){
-    uint length1 = bytes(_str1).length;
-    uint length2 = bytes(_str2).length;
-    uint n = max(length1, length2) + 1;
-    uint[20][] memory distance = new uint[20][](n);
-    bytes memory str1 = bytes(_str1);
-    bytes memory str2 = bytes(_str2);
+  function obtainScore(uint[] memory _resul) private view returns(uint256){
 
-    for(uint i=0; i<=length1; i++){
-      distance[i][0]=i;
-    }
-    for(uint j=0; j<=length2; j++){
-      distance[0][j]=j;
-    }
-    for(uint i=1; i<=length1; i++){
-      for(uint j=1; j<=length2; j++){
-        uint aux = 1;
-        if (str1[i-1] == str2[j-1]){
-          aux = 0;
-        }
-        distance[i][j]= minimum(distance[i-1][j] + 1, distance[i][j-1] + 1, distance[i-1][j-1] + aux);
+    uint score = 0;
+    uint length = solution.length;
+
+    for(uint i=0; i<length; i++){
+      if (_resul[i] != solution[i]){
+        score++;
       }
     }
 
-    return (uint256(distance[length1][length2]));
-  }
-
-  function minimum(uint a, uint b, uint c) private pure returns (uint){
-    uint smallest;
-    if (a <= b && a <= c) {
-      smallest = a;
-    } else if (b <= c && b <= a) {
-      smallest = b;
-    } else {
-      smallest = c;
-    }
-
-    return (smallest);
-  }
-
-  function max(uint a, uint b) private pure returns (uint){
-    uint resul;
-
-    if(b > a){
-      resul = b;
-    } else {
-      resul = a;
-    }
-
-    return (resul);
+    return score;
   }
 
 }
