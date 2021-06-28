@@ -3,9 +3,7 @@
 
 from tkinter import *
 from tkinter import ttk
-from colorama import Fore, Back, init #,Style
-from threading import Thread
-import time
+from colorama import Fore, Back, init
 from functools import partial
 from LevDistContract import *
 from Notifications import *
@@ -71,14 +69,11 @@ class App():
         self.root.wait_window(setContestWindow)
 
 
-
     def info(self, levdist):
 
-        # Borra el contenido que tenga en un momento dado
-        # la caja de texto
+        # Delete info of the textbox
         self.tinfo.delete("1.0", END)
 
-        # Obtiene información de la ventana 'self.root':
         info1 = str(levdist.getInitStatus())
         info2 = str(levdist.getAdmin())
         info3 = str(levdist.getSolution())
@@ -86,8 +81,6 @@ class App():
         info5 = str(levdist.getWinners())
         info6 = str(levdist.getName())
 
-        # Construye una cadena de texto con toda la
-        # información obtenida:
         texto_info = "Status: " + info1 + "\n"
         texto_info += "Admin: " + info2 + "\n"
         texto_info += "Solution: " + info3 + "\n"
@@ -95,7 +88,7 @@ class App():
         texto_info += "Winners: " + info5 + "\n"
         texto_info += "Name: " + info6 + "\n"
 
-        # Inserta la información en la caja de texto:
+        # Insert info in the textbox
         self.tinfo.insert("1.0", texto_info)
 
 def main():
@@ -103,15 +96,9 @@ def main():
     init(autoreset=True)
     print(Back.GREEN +"\n")
 
-    # #- - - - - Listen to Events in Thread - - - -
-    # block_filter = w3.eth.filter({'fromBlock':'latest', "address": CONTRACT_ADDR})
-    # event_filter = WINNER_EVENT.createFilter(fromBlock='latest')
-    # worker = Thread(target=log_loop, args=(event_filter, POLL_INTERVAL), daemon=True)
-    # worker.start()
-
     #- - - - - Launch GUI - - - - -
-    notif = Notifications()
     levdist = LevDistContract()
+    notif = Notifications(levdist)
     mi_app = App(levdist)
     return 0
 

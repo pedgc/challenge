@@ -6,7 +6,7 @@ import binascii
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0x9797Ab86AaEd7Fc185Bf69039a4C7d2110fEA74c'
+CONTRACT_ADDR = '0x804Dc04aa3BB66b95ba90840ed79Eb3A2F41a8cA'
 ABI_JSON = '../build/contracts/LevDistance.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 GAS = 300000000
