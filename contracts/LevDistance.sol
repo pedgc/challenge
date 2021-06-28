@@ -8,12 +8,18 @@ contract LevDistance {
   address private admin;
   address payable[] private winners;
   address payable[] private contesters;
-  uint prize;
+  uint public prize;
+  bool public status;
+  bool public prizeHasBeenSent;
+  string public name;
   mapping(address => uint256) public users;
 
   constructor () public{
     admin = msg.sender;
     prize = 0;
+    status = false;
+    prizeHasBeenSent = false;
+    name = "Text Reading Contest";
   }
 
   modifier onlyAdmin {
@@ -23,16 +29,23 @@ contract LevDistance {
 
 /* = = = = = = = FUNCTIONS = = = = = = = */
 // - - - - Getters & Setters - - - -
-function setAdmin(address _newAdmin) public onlyAdmin {
+function setAdmin(address _newAdmin) public onlyAdmin{
   admin = _newAdmin;
 }
-function setSolution(string memory _solution) public onlyAdmin{
-  solution = _solution;
+function setName(string memory _name) public onlyAdmin{
+  name = _name;
 }
-function setPrize() public payable onlyAdmin{
-  require(msg.value > 0, "Prize can not be 0");
-  prize = msg.value;
-}
+// function setSolution(string memory _solution) private{
+//   solution = _solution;
+// }
+// function setPrize() private payable onlyAdmin{
+//   require(msg.value > 0, "Prize can not be 0");
+//   prize = msg.value;
+// }
+// function setStatus(bool _status) private{
+//   status = _status;
+// }
+
 
 function getAdmin() public view returns(address){
   return admin;
@@ -46,13 +59,80 @@ function getPrize() public view returns(uint){
 function getWinners() public view onlyAdmin returns(address payable[] memory){
   return winners;
 }
+function getStatus() public view returns(bool){
+  return status;
+}
+function getName() public view returns(string memory){
+  return name;
+}
 
 // - - - - - - - - - - - - - - - - -
 
 // - - - - Events - - - -
-event Winner(string _winner);
+event Notification(string _notif);
 
-// - - - - - - - - - -
+// - - - - - Admin - - - - -
+
+  function createContest(string memory _solution) public payable onlyAdmin{
+    require(msg.value > 0, "Prize can not be 0");
+
+    solution = _solution;
+    status = true;
+    prize = msg.value;
+
+    emit Notification("The contest has been created correctly");
+  }
+
+  function calculateWinners() public onlyAdmin{
+    require(contesters.length >= 1, "We should have at least 1 contester");
+
+    uint min = users[contesters[0]];
+    uint256 i;
+
+    // Obtain the minimum score
+    for(i = 1; i < contesters.length; i++){
+        if(users[contesters[i]] < min) {
+            min = users[contesters[i]];
+        }
+    }
+
+    // Obtain all contesters with minimum score
+    for(i = 0; i < contesters.length; i++){
+      if(users[contesters[i]] == min) {
+          winners.push(contesters[i]);
+      }
+    }
+
+    emit Notification("The winner/s has/have been calculated correctly");
+  }
+
+  function sendPrizeToWinners() public payable onlyAdmin{
+    require(winners.length >= 1, "We should have at least 1 winner");
+
+    uint prizePerWinner = prize/winners.length;
+    uint i;
+
+    for(i = 0; i < winners.length; i++){
+      winners[i].transfer(prizePerWinner);
+    }
+
+    prizeHasBeenSent = true;
+    emit Notification("The prize has been sent to the winner/s");
+  }
+
+  // - - - - - - - Reset Contest - - - - - - - -
+  function resetContest() public onlyAdmin{
+    require(prizeHasBeenSent == true, "You can not reset the contest without sending prize to winner/s");
+
+    solution = "";
+    prize = 0;
+    delete winners;
+    delete contesters;
+    status = false;
+
+    emit Notification("The contest has been reset correctly");
+  }
+
 
 // - - - - Participants - - - -
   function contest(string memory _resul) public{
@@ -111,49 +191,5 @@ event Winner(string _winner);
 
     return (resul);
   }
-
-// - - - - - - - Winner & prize - - - - - - - -
-  function calculateWinners() public onlyAdmin{
-    require(contesters.length >= 1, "We should have at least 1 contester");
-
-    uint min = users[contesters[0]];
-    uint256 i;
-
-    // Obtain the minimum score
-    for(i = 1; i < contesters.length; i++){
-        if(users[contesters[i]] < min) {
-            min = users[contesters[i]];
-        }
-    }
-
-    // Obtain all contesters with minimum score
-    for(i = 0; i < contesters.length; i++){
-      if(users[contesters[i]] == min) {
-          winners.push(contesters[i]);
-      }
-    }
-
-  }
-
-  function sendPrizeToWinners() public payable onlyAdmin{
-    require(winners.length >= 1, "We should have at least 1 winner");
-
-    uint prizePerWinner = prize/winners.length;
-    uint i;
-
-    for(i = 0; i < winners.length; i++){
-      winners[i].transfer(prizePerWinner);
-    }
-    emit Winner("Finished sending prizes");
-  }
-
-  // - - - - - - - Reset Contest - - - - - - - -
-  function resetContest() public onlyAdmin{
-    solution = "";
-    prize = 0;
-    delete winners;
-    delete contesters;
-  }
-
 
 }

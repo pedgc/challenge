@@ -9,7 +9,7 @@ import time
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0xf14B4527b1515e2A9CA0baB16CFdee04e3F0EF75'
+CONTRACT_ADDR = '0x7Ac6c1B9A1B929802548f48Cc7597205B99bc487'
 ABI_JSON = '../build/contracts/LevDistance.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 
@@ -103,16 +103,23 @@ def main():
 
     # Contest Solutions & Resul
     solution = "Skullcandy"
-    pl1_resul = "Skulxcandy"
+    pl1_resul = "Skullcandy"
     pl2_resul = "Skulcandy"
     pl3_resul = "Skullcandy"
     pl4_resul = "Skullcandii"
 
-    # Setting Solution & Prize
+    # Initial Contest Status
+    initStatus = contract.functions.getStatus().call()
+
+    # Setting Solution, Prize & Status
     contract.functions.setSolution(solution).transact(adminVoidTx)
     solutionFromContract = contract.functions.getSolution().call()
     contract.functions.setPrize().transact(adminPrizeTx)
     prize = contract.functions.getPrize().call()
+    contract.functions.setStatus(True).transact(adminVoidTx)
+
+    # Final Contest Status
+    finalStatus = contract.functions.getStatus().call()
 
     # Contesters
     contract.functions.contest(pl1_resul).transact(pl1_contest_trans)
@@ -132,6 +139,9 @@ def main():
 
     # = = = = = = = = = PRINTING = = = = = = = = =
     print(TITLE + "\n\t\tCONTEST")
+    print("Initial Status: "+ BLUE +str(initStatus))
+    print("Final Status: "+ BLUE +str(finalStatus))
+    print("- - - - - - - - - - - - - -")
     print("Solution:"+ BLUE +" "+str(solution))
     print("Solution from Contract:"+ BLUE +" "+str(solutionFromContract))
     print("Prize: "+ BLUE +" "+str(prize))
