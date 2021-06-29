@@ -136,6 +136,7 @@ event Notification(string _notif);
 
 // - - - - Participants - - - -
   function contest(string memory _resul) public{
+    require(msg.sender != admin, "Admin is not allowed to be a contester");
     users[msg.sender] = obtainScore(_resul, solution);
     contesters.push(msg.sender);
   }

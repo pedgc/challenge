@@ -136,6 +136,7 @@ event Notification(string _notif);
 
 // - - - - Participants - - - -
   function contest(uint[] memory _resul) public{
+    require(msg.sender != admin, "Admin is not allowed to be a contester");
     require(_resul.length == solution.length, "The dataset length is not correct");
     users[msg.sender] = obtainScore(_resul);
     contesters.push(msg.sender);

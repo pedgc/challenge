@@ -6,14 +6,14 @@ import binascii
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0x447a040dfd164D15634346Dc97ff38b48B973aDB'
-ABI_JSON = '../build/contracts/LevDistance.json'
+CONTRACT_ADDR = '0xd024030a23351c1902Bc183Fe3e160D9d39AE787'
+ABI_JSON = '../build/contracts/DogsOrCats.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 GAS = 300000000
 GAS_PRICE = 21000
 
 
-class LevDistContract():
+class DogsOrCats():
     def __init__(self):
         # = = = = = = = CONNECTION TO CONTRACT = = = = = = = = =
         with open(ABI_JSON) as json_file:

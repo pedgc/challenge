@@ -9,9 +9,9 @@ POLL_INTERVAL = 1
 
 
 class Notifications():
-    def __init__(self, levdist):
-        self.w3 = levdist.w3
-        self.NOTIF_EVENT = levdist.contract.events.Notification()   # Needs to be instanciated due to Web3py limitations
+    def __init__(self, obj):
+        self.w3 = obj.w3
+        self.NOTIF_EVENT = obj.contract.events.Notification()   # Needs to be instanciated due to Web3py limitations
         self.event_filter = self.NOTIF_EVENT.createFilter(fromBlock='latest')
         self.launchThread()
 
