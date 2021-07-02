@@ -27,13 +27,17 @@ contract DogsOrCats {
         _;
   }
 
+  // - - - - Event - - - -
+  event Notification(string _notif, address _sender);
 /* = = = = = = = FUNCTIONS = = = = = = = */
 // - - - - Getters & Setters - - - -
 function setAdmin(address _newAdmin) public onlyAdmin{
   admin = _newAdmin;
+  emit Notification("The admin has been changed correctly", msg.sender);
 }
 function setName(string memory _name) public onlyAdmin{
   name = _name;
+  emit Notification("The name has been changed correctly", msg.sender);
 }
 
 function getWinners() public view onlyAdmin returns(address payable[] memory){
@@ -60,11 +64,6 @@ function getStatus() public view returns(bool){
 function getName() public view returns(string memory){
   return name;
 }
-
-// - - - - - - - - - - - - - - - - -
-
-// - - - - Events - - - -
-event Notification(string _notif, address _sender);
 
 // - - - - - Admin - - - - -
 

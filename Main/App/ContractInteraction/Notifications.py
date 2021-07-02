@@ -36,3 +36,23 @@ class Notification():
     def launchThread(self):
         worker = Thread(target=self.log_loop, args=(self.event_filter, POLL_INTERVAL), daemon=True)
         worker.start()
+
+class ErrorNotification():
+    def __init__(self):
+        a = 1
+
+    def showErrorNotif(self, error):
+        notification.notify(
+            title='Error',
+            message=error,
+            app_name='Text Challenge',
+            app_icon='path/to/the/icon.png'
+        )
+
+    def showUnexpErrorNotif(self):
+        notification.notify(
+            title='Error',
+            message='Unexpected Error: Please read command line to obtain more info',
+            app_name='Text Challenge',
+            app_icon='path/to/the/icon.png'
+        )

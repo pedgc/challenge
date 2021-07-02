@@ -13,7 +13,7 @@ from Notifications import Notification
 
 
 class App():
-    def __init__(self, levdist, dogsOrCats):
+    def __init__(self, textImage, dogsOrCats):
 
         # Main Window
         self.root = Tk()
@@ -28,9 +28,11 @@ class App():
 
         # Image Text Contest Buttons
         self.textFrame = ttk.Frame(self.root)
-        self.binfo_text = ttk.Button(self.textFrame, text='Info', command=partial(self.info, levdist))
-        self.bSetContest_text = ttk.Button(self.textFrame, text='Set Contest', command=partial(self.setContest, levdist))
-        self.bResetContest_text = ttk.Button(self.textFrame, text='Reset Contest', command=levdist.resetContest)
+        self.binfo_text = ttk.Button(self.textFrame, text='Info', command=partial(self.info, textImage))
+        self.bSetContest_text = ttk.Button(self.textFrame, text='Set Contest', command=partial(self.setContest, textImage))
+        self.bResetContest_text = ttk.Button(self.textFrame, text='Reset Contest', command=textImage.resetContest)
+        self.bSetName_text = ttk.Button(self.textFrame, text='Set Contest Name', command=partial(self.setName, textImage))
+        self.bSetAdmin_text = ttk.Button(self.textFrame, text='Set Contract Admin', command=partial(self.setAddress, textImage))
         self.separator2 = ttk.Separator(self.root, orient=HORIZONTAL)
 
         # Dog Or Cat Contest Buttons
@@ -38,6 +40,8 @@ class App():
         self.binfo_DoC = ttk.Button(self.DoCFrame, text='Info', command=partial(self.info, dogsOrCats))
         self.bSetContest_DoC = ttk.Button(self.DoCFrame, text='Set Contest', command=partial(self.setContest, dogsOrCats))
         self.bResetContest_DoC = ttk.Button(self.DoCFrame, text='Reset Contest', command=dogsOrCats.resetContest)
+        self.bSetName_DoC = ttk.Button(self.DoCFrame, text='Set Contest Name', command=partial(self.setName, dogsOrCats))
+        self.bSetAdmin_DoC = ttk.Button(self.DoCFrame, text='Set Contract Admin', command=partial(self.setAddress, dogsOrCats))
         self.separator3 = ttk.Separator(self.root, orient=HORIZONTAL)
 
         # Exit Button
@@ -52,14 +56,18 @@ class App():
         self.textFrame.pack(side=TOP, fill=BOTH, expand=True)
         self.binfo_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.bSetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bResetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
+        self.bResetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
+        self.bSetName_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
+        self.bSetAdmin_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.separator2.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
 
         # Dog Or Cat Contest Buttons
         self.DoCFrame.pack(side=TOP, fill=BOTH, expand=True)
         self.binfo_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.bSetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bResetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
+        self.bResetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
+        self.bSetName_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
+        self.bSetAdmin_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.separator3.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
 
         # Exit Button
@@ -69,6 +77,7 @@ class App():
         self.binfo_text.focus_set()
         self.root.mainloop()
 
+    # Set Contest Window
     def setContest(self, contestObject):
         setContestWindow = Toplevel()
         setContestWindow.geometry('300x200')
@@ -97,6 +106,58 @@ class App():
         bCancel.focus_set()
 
         self.root.wait_window(setContestWindow)
+
+    # Set Contest Name Window
+    def setName(self, contestObject):
+        setNameWindow = Toplevel()
+        setNameWindow.geometry('300x120')
+        setNameWindow.resizable(width=True,height=True)
+        setNameWindow.title("Set Contest Name")
+        setNameWindow.transient(master=self.root)
+        setNameWindow.grab_set()
+
+        Name = StringVar()
+        labelName = ttk.Label(setNameWindow, text="New Name:")
+        valueName = ttk.Entry(setNameWindow, width=30)
+        separ1 = ttk.Separator(setNameWindow, orient=HORIZONTAL)
+
+        bChange = ttk.Button(setNameWindow, text="Change Name", command=lambda : contestObject.setName(valueName.get()))
+        bCancel = ttk.Button(setNameWindow, text='Cancel', command=setNameWindow.destroy)
+
+        labelName.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
+        valueName.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
+        separ1.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
+        bChange.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
+        bCancel.pack(side=RIGHT, fill=BOTH, expand=True, padx=5, pady=5)
+        bCancel.focus_set()
+
+        self.root.wait_window(setNameWindow)
+
+    # Set Contract Admin Address Window
+    def setAddress(self, contestObject):
+        setAddressWindow = Toplevel()
+        setAddressWindow.geometry('300x120')
+        setAddressWindow.resizable(width=True,height=True)
+        setAddressWindow.title("Set Contest Name")
+        setAddressWindow.transient(master=self.root)
+        setAddressWindow.grab_set()
+
+        Address = StringVar()
+        labelAddress = ttk.Label(setAddressWindow, text="New Admin Address:")
+        valueAddress = ttk.Entry(setAddressWindow, width=30)
+        separ1 = ttk.Separator(setAddressWindow, orient=HORIZONTAL)
+
+        bChange = ttk.Button(setAddressWindow, text="Change Address", command=lambda : contestObject.setAdmin(valueAddress.get()))
+        bCancel = ttk.Button(setAddressWindow, text='Cancel', command=setAddressWindow.destroy)
+
+        labelAddress.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
+        valueAddress.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
+        separ1.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
+        bChange.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
+        bCancel.pack(side=RIGHT, fill=BOTH, expand=True, padx=5, pady=5)
+        bCancel.focus_set()
+
+        self.root.wait_window(setAddressWindow)
 
     def validateAndCreate(self, contestObject, prize, valueSolution):
         paramsAreValid = False
