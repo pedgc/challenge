@@ -1,31 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from functools import partial
 from tkinter import *
 from tkinter import ttk
-from colorama import Fore, Back, init
-from functools import partial
-from LevDistContract import *
-from DogsOrCats import *
-from Notifications import *
+import sys
+sys.path.insert(0, 'App/ContractInteraction')
+from ContractInteraction import DogsOrCatsContract, TextImageContract, Notifications
+from DogsOrCatsContract import DogsOrCats
+from TextImageContract import TextImage
+from Notifications import Notification
 
-#- - - - Pretty Print variables - - - -
-TITLE = Back.BLACK + Fore.RED
-BLUE = Fore.BLUE
-EVENT = Fore.YELLOW
 
 class App():
     def __init__(self, levdist, dogsOrCats):
 
         # Main Window
         self.root = Tk()
-        self.root.geometry('600x400')
+        self.root.geometry('600x500')
         self.root.resizable(width=True,height=True)
         self.root.title('Admin')
 
         # = = = = = = Widget Functionality = = = = = = = =
         # Information Field
-        self.tinfo = Text(self.root, width=60, height=10)
+        self.tinfo = Text(self.root, width=70, height=20)
         self.separator1 = ttk.Separator(self.root, orient=HORIZONTAL)
 
         # Image Text Contest Buttons
@@ -104,7 +102,7 @@ class App():
         paramsAreValid = False
 
         if (isinstance(prize.get(), float)):
-            if (isinstance(contestObject, LevDistContract)):
+            if (isinstance(contestObject, TextImage)):
                 if (isinstance(valueSolution.get(), str)):
                     contestObject.createContest(prize.get(), str(valueSolution.get()))
             elif (isinstance(contestObject, DogsOrCats)):
@@ -120,35 +118,27 @@ class App():
         # Delete info of the textbox
         self.tinfo.delete("1.0", END)
 
-        info1 = str(contestObject.getInitStatus())
-        info2 = str(contestObject.getAdmin())
-        info3 = str(contestObject.getSolution())
-        info4 = str(contestObject.getPrize())
-        info5 = str(contestObject.getWinners())
-        info6 = str(contestObject.getName())
+        adminInfo = """
+= = = = = = = = = = =
+= ADMIN INFORMATION =
+= = = = = = = = = = =
+"""
+        userInfo = """
+= = = = = = = = = = =
+= USER INFORMATION  =
+= = = = = = = = = = =
+"""
 
-        texto_info = "Status: " + info1 + "\n"
-        texto_info += "Admin: " + info2 + "\n"
-        texto_info += "Solution: " + info3 + "\n"
-        texto_info += "Prize: " + info4 + "\n"
-        texto_info += "Winners: " + info5 + "\n"
-        texto_info += "Name: " + info6 + "\n"
+        text_info = adminInfo
+        text_info += "Solution: " + str(contestObject.getSolution()) + "\n"
+        text_info += "Winners: " + str(contestObject.getWinners()) + "\n"
+        text_info += userInfo
+        text_info += "Name: " + str(contestObject.getName()) + "\n"
+        text_info += "Status: " + str(contestObject.getStatus()) + "\n"
+        text_info += "Prize: " + str(contestObject.getPrize()) + "\n"
+        text_info += "Prize Has Been Sent: " + str(contestObject.getPrizeHasBeenSent()) + "\n"
+        text_info += "Contesters: " + str(contestObject.getContesters()) + "\n"
+        text_info += "Admin: " + str(contestObject.getAdmin()) + "\n"
 
         # Insert info in the textbox
-        self.tinfo.insert("1.0", texto_info)
-
-def main():
-    # - - - Pretty Print - - -
-    init(autoreset=True)
-    print(Back.GREEN +"\n")
-
-    #- - - - - Launch GUI - - - - -
-    levdist = LevDistContract()
-    dogorcat = DogsOrCats()
-    notif_lev = Notifications(levdist)
-    notif_dog = Notifications(dogorcat)
-    mi_app = App(levdist, dogorcat)
-    return 0
-
-if __name__ == '__main__':
-    main()
+        self.tinfo.insert("1.0", text_info)

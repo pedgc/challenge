@@ -8,22 +8,24 @@ import time
 POLL_INTERVAL = 1
 
 
-class Notifications():
+class Notification():
     def __init__(self, obj):
         self.w3 = obj.w3
         self.NOTIF_EVENT = obj.contract.events.Notification()   # Needs to be instanciated due to Web3py limitations
         self.event_filter = self.NOTIF_EVENT.createFilter(fromBlock='latest')
+        self.myAccount = obj.myAccount
         self.launchThread()
 
     def handle_event(self, event):
         receipt = self.w3.eth.wait_for_transaction_receipt(event['transactionHash'])
         result = self.NOTIF_EVENT.processReceipt(receipt, errors=STRICT)
-        notification.notify(
-            title='Notification',
-            message=str(result[0]['args']['_notif']),
-            app_name='Text Challenge',
-            app_icon='path/to/the/icon.png'
-        )
+        if (self.myAccount == str(result[0]['args']['_sender'])):
+            notification.notify(
+                title='Notification',
+                message=str(result[0]['args']['_notif']),
+                app_name='Text Challenge',
+                app_icon='path/to/the/icon.png'
+            )
 
     def log_loop(self, event_filter, poll_interval):
         while True:

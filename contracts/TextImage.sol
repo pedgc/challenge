@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract LevDistance {
+contract TextImage {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
   //State variables -> Permanently saved in the contract
@@ -35,29 +35,24 @@ function setAdmin(address _newAdmin) public onlyAdmin{
 function setName(string memory _name) public onlyAdmin{
   name = _name;
 }
-// function setSolution(string memory _solution) private{
-//   solution = _solution;
-// }
-// function setPrize() private payable onlyAdmin{
-//   require(msg.value > 0, "Prize can not be 0");
-//   prize = msg.value;
-// }
-// function setStatus(bool _status) private{
-//   status = _status;
-// }
 
-
-function getAdmin() public view returns(address){
-  return admin;
-}
 function getSolution() public view onlyAdmin returns(string memory){
   return solution;
+}
+function getWinners() public view onlyAdmin returns(address payable[] memory){
+  return winners;
+}
+function getAdmin() public view returns(address){
+  return admin;
 }
 function getPrize() public view returns(uint){
   return prize;
 }
-function getWinners() public view onlyAdmin returns(address payable[] memory){
-  return winners;
+function getContesters() public view returns(address payable[] memory){
+  return contesters;
+}
+function getPrizeHasBeenSent() public view returns(bool){
+  return prizeHasBeenSent;
 }
 function getStatus() public view returns(bool){
   return status;
@@ -69,7 +64,7 @@ function getName() public view returns(string memory){
 // - - - - - - - - - - - - - - - - -
 
 // - - - - Events - - - -
-event Notification(string _notif);
+event Notification(string _notif, address _sender);
 
 // - - - - - Admin - - - - -
 
@@ -80,7 +75,7 @@ event Notification(string _notif);
     status = true;
     prize = msg.value;
 
-    emit Notification("The contest has been created correctly");
+    emit Notification("The contest has been created correctly", msg.sender);
   }
 
   function calculateWinners() public onlyAdmin{
@@ -103,7 +98,7 @@ event Notification(string _notif);
       }
     }
 
-    emit Notification("The winner/s has/have been calculated correctly");
+    emit Notification("The winner/s has/have been calculated correctly", msg.sender);
   }
 
   function sendPrizeToWinners() public payable onlyAdmin{
@@ -117,7 +112,7 @@ event Notification(string _notif);
     }
 
     prizeHasBeenSent = true;
-    emit Notification("The prize has been sent to the winner/s");
+    emit Notification("The prize has been sent to the winner/s", msg.sender);
   }
 
   // - - - - - - - Reset Contest - - - - - - - -
@@ -130,13 +125,14 @@ event Notification(string _notif);
     delete contesters;
     status = false;
 
-    emit Notification("The contest has been reset correctly");
+    emit Notification("The contest has been reset correctly", msg.sender);
   }
 
 
 // - - - - Participants - - - -
   function contest(string memory _resul) public{
     require(msg.sender != admin, "Admin is not allowed to be a contester");
+    require(status, "The contest is not active");
     users[msg.sender] = obtainScore(_resul, solution);
     contesters.push(msg.sender);
   }
