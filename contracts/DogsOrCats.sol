@@ -102,6 +102,7 @@ function getName() public view returns(string memory){
 
   function sendPrizeToWinners() public payable onlyAdmin{
     require(winners.length >= 1, "We should have at least 1 winner");
+    require(prizeHasBeenSent == false, "The prize has already been sent");
 
     uint prizePerWinner = prize/winners.length;
     uint i;
@@ -123,6 +124,7 @@ function getName() public view returns(string memory){
     delete winners;
     delete contesters;
     status = false;
+    prizeHasBeenSent = false;
 
     emit Notification("The contest has been reset correctly", msg.sender);
   }
@@ -133,8 +135,13 @@ function getName() public view returns(string memory){
     require(msg.sender != admin, "Admin is not allowed to be a contester");
     require(_resul.length == solution.length, "The dataset length is not correct");
     require(status, "The contest is not active");
+
     users[msg.sender] = obtainScore(_resul);
-    contesters.push(msg.sender);
+    if(isFirstAttempt(msg.sender)){
+      contesters.push(msg.sender);
+    }
+
+    emit Notification("Your solution has been sent", msg.sender);
   }
 
   function obtainScore(uint[] memory _resul) private view returns(uint256){
@@ -149,6 +156,18 @@ function getName() public view returns(string memory){
     }
 
     return score;
+  }
+
+  function isFirstAttempt(address) private view returns(bool){
+    bool resul = true;
+
+    for(uint i=0; i<contesters.length && resul; i++){
+      if(contesters[i] == msg.sender){
+        resul = false;
+      }
+    }
+
+    return resul;
   }
 
 }

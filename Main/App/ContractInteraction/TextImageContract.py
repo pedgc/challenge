@@ -9,7 +9,7 @@ from Notifications import ErrorNotification
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0x308f8fA1ce920da55d814131Ce77Eb4C62A2ceA6'
+CONTRACT_ADDR = '0xeA7180f452026DCCE377153c1ceC52a73510df7B'
 ABI_JSON = '../build/contracts/TextImage.json'
 NODE_HTTP = 'http://127.0.0.1:7545'
 GAS = 300000000
@@ -17,74 +17,86 @@ GAS_PRICE = 21000
 
 
 class TextImage():
-    def __init__(self):
+    def __init__(self, private_key):
         # = = = = = = = CONNECTION TO CONTRACT = = = = = = = = =
         with open(ABI_JSON) as json_file:
             info_json = json.load(json_file)
         abi = info_json["abi"]
         self.w3 = Web3(Web3.HTTPProvider(NODE_HTTP))
         self.contract = self.w3.eth.contract(address=CONTRACT_ADDR, abi=abi)
-        self.accounts = self.w3.eth.accounts
-        self.myAccount = self.accounts[0]
+        self.myAccount = self.w3.eth.account.from_key(private_key).address
         self.errorNotif = ErrorNotification()
-        print("myAccount:\n\t" + self.myAccount +"\n\t"+ str(type(self.myAccount)))
+        print("myAccount:\n\t" + str(self.myAccount) +"\n\t"+ str(type(self.myAccount)))
+        self.private_key = 0x0
 
     # - - - - - - Getters & Setters - - - - - - - -
     def getSolution(self):
         try:
             return self.contract.functions.getSolution().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getSolution")
+
     def getWinners(self):
         try:
             return self.contract.functions.getWinners().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getWinners")
+
+    def setAdmin(self, newAdminAddr):
+        try:
+            print("SetAdmin\n\tNew Address: " + newAdminAddr)
+            self.contract.functions.setAdmin(newAdminAddr).transact(self.createTx(self.myAccount, 0))
+        except ValueError as v:
+            dict = literal_eval(str(v))
+            self.errorNotif.showErrorNotif(str(dict['message']))
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "setAdmin")
+
+    def setName(self, newName):
+        try:
+            self.contract.functions.setName(newName).transact(self.createTx(self.myAccount, 0))
+        except ValueError as v:
+            dict = literal_eval(str(v))
+            self.errorNotif.showErrorNotif(str(dict['message']))
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "setName")
 
     # Users
     def getStatus(self):
         try:
             return self.contract.functions.getStatus().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getStatus")
 
     def getAdmin(self):
         try:
             return self.contract.functions.getAdmin().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getAdmin")
 
     def getPrize(self):
         try:
             return self.contract.functions.getPrize().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getPrize")
 
     def getName(self):
         try:
             return self.contract.functions.getName().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getName")
 
     def getContesters(self):
         try:
             return self.contract.functions.getContesters().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getContesters")
 
     def getPrizeHasBeenSent(self):
         try:
             return self.contract.functions.getPrizeHasBeenSent().call()
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "getPrizeHasBeenSent")
 
     # - - - - - - - - Methods - - - - - - - -
     def createTx(self, _from, _value):
@@ -103,8 +115,7 @@ class TextImage():
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "createContest")
 
     def resetContest(self):
         try:
@@ -113,29 +124,25 @@ class TextImage():
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "resetContest")
 
-    def setAdmin(self, newAdminAddr):
+    def calculateWinners(self):
         try:
-            print("SetAdmin\n\tNew Address: " + newAdminAddr)
-            self.contract.functions.setAdmin(newAdminAddr).transact(self.createTx(self.myAccount, 0))
+            self.contract.functions.calculateWinners().transact(self.createTx(self.myAccount, 0))
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "calculateWinners")
 
-    def setName(self, newName):
+    def sendPrizeToWinners(self):
         try:
-            self.contract.functions.setName(newName).transact(self.createTx(self.myAccount, 0))
+            self.contract.functions.sendPrizeToWinners().transact(self.createTx(self.myAccount, 0))
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "sendPrizeToWinners")
 
     def contest(self, solution):
         try:
@@ -144,5 +151,4 @@ class TextImage():
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "contest")

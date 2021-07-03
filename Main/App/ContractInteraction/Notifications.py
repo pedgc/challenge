@@ -3,9 +3,16 @@ from web3.logs import STRICT, IGNORE, DISCARD, WARN
 from plyer.utils import platform
 from plyer import notification
 from threading import Thread
+from datetime import datetime
 import time
+from colorama import Fore, Back, init
 
 POLL_INTERVAL = 1
+#- - - - Pretty Print - - - -
+ERROR = Back.BLACK + Fore.RED
+TSTAMP = Fore.BLACK
+FNAME = Fore.YELLOW
+EXCEPTION = Fore.BLUE
 
 
 class Notification():
@@ -49,10 +56,16 @@ class ErrorNotification():
             app_icon='path/to/the/icon.png'
         )
 
-    def showUnexpErrorNotif(self):
+    def showUnexpErrorNotif(self, error, f_name):
         notification.notify(
             title='Error',
             message='Unexpected Error: Please read command line to obtain more info',
             app_name='Text Challenge',
             app_icon='path/to/the/icon.png'
         )
+        print(ERROR+"\nERROR")
+        print(TSTAMP+"<"+str(datetime.now().strftime("%H:%M:%S.%f"))+"> "+FNAME+"["+f_name+"]")
+        print(EXCEPTION+str(type(error))+": "+str(error))
+
+class InvalidLengthError(Exception):
+    pass

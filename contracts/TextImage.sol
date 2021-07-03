@@ -102,6 +102,7 @@ function getName() public view returns(string memory){
 
   function sendPrizeToWinners() public payable onlyAdmin{
     require(winners.length >= 1, "We should have at least 1 winner");
+    require(prizeHasBeenSent == false, "The prize has already been sent");
 
     uint prizePerWinner = prize/winners.length;
     uint i;
@@ -123,6 +124,7 @@ function getName() public view returns(string memory){
     delete winners;
     delete contesters;
     status = false;
+    prizeHasBeenSent = false;
 
     emit Notification("The contest has been reset correctly", msg.sender);
   }
@@ -132,8 +134,13 @@ function getName() public view returns(string memory){
   function contest(string memory _resul) public{
     require(msg.sender != admin, "Admin is not allowed to be a contester");
     require(status, "The contest is not active");
+
     users[msg.sender] = obtainScore(_resul, solution);
-    contesters.push(msg.sender);
+    if(isFirstAttempt(msg.sender)){
+      contesters.push(msg.sender);
+    }
+
+    emit Notification("Your solution has been sent", msg.sender);
   }
 
   //Explain about levehnstein distance
@@ -187,6 +194,18 @@ function getName() public view returns(string memory){
     }
 
     return (resul);
+  }
+
+  function isFirstAttempt(address) private view returns(bool){
+    bool resul = true;
+
+    for(uint i=0; i<contesters.length && resul; i++){
+      if(contesters[i] == msg.sender){
+        resul = false;
+      }
+    }
+
+    return resul;
   }
 
 }

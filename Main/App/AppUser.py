@@ -75,7 +75,6 @@ class App():
             contestWindow.transient(master=self.root)
             contestWindow.grab_set()
 
-
             labelSolution = ttk.Label(contestWindow, text="Solution:")
             valueSolution = ttk.Entry(contestWindow, width=30)
             separ1 = ttk.Separator(contestWindow, orient=HORIZONTAL)
@@ -92,12 +91,9 @@ class App():
 
             self.root.wait_window(contestWindow)
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "Contest")
 
     def validateAndContest(self, contestObject, valueSolution):
-        paramsAreValid = False
-
         try:
             if (type(contestObject) is TextImage):
                 if (isinstance(valueSolution.get(), str)):
@@ -113,8 +109,7 @@ class App():
             error = "Incorrect Solution Format: "+str(v)
             self.errorNotif.showErrorNotif(error)
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "validateAndContest")
 
 
     def info(self, contestObject):
@@ -122,14 +117,8 @@ class App():
             # Delete info of the textbox
             self.tinfo.delete("1.0", END)
 
-            userInfo = """
-= = = = = = = = = = =
-= USER INFORMATION  =
-= = = = = = = = = = =
-"""
-            text_info = userInfo
-            text_info += "Name: " + str(contestObject.getName()) + "\n"
-            text_info += "Status: " + str(contestObject.getStatus()) + "\n"
+            text_info = self.info_getName(contestObject)
+            text_info += self.info_getStatus(contestObject)
             text_info += "Prize: " + str(contestObject.getPrize()) + "\n"
             text_info += "Prize Has Been Sent: " + str(contestObject.getPrizeHasBeenSent()) + "\n"
             text_info += "Contesters: " + str(contestObject.getContesters()) + "\n"
@@ -138,5 +127,22 @@ class App():
             # Insert info in the textbox
             self.tinfo.insert("1.0", text_info)
         except Exception as e:
-            self.errorNotif.showUnexpErrorNotif()
-            print("\nERROR:\n\t" + str(e))
+            self.errorNotif.showUnexpErrorNotif(e, "info")
+
+    def info_getName(self, contestObject):
+        resul = ""
+        try:
+            resul = "\t"+str(contestObject.getName())+"\n"
+            resul = resul.upper()
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getName")
+        return resul
+
+    def info_getStatus(self, contestObject):
+        resul = "The contest is NOT active\n"
+        try:
+            if (contestObject.getStatus()):
+                resul = "The contest is ACTIVE\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getStatus")
+        return resul
