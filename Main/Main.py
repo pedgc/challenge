@@ -14,20 +14,19 @@ from Notifications import Notification
 
 
 def main():
-
     # - - - Pretty Print - - -
     init(autoreset=True)
     print(Back.GREEN +"\n")
-
+    print(Fore.BLUE + "The program started correctly")
     #- - - - - Launch GUI - - - - -
     privKey = Authentication().obtainPrivateKey()
-    print("Private Key: "+str(privKey))
     textimage = TextImage(privKey)
     dogorcat = DogsOrCats(privKey)
     privKey = 0x0
     notif_lev = Notification(textimage)
     notif_dog = Notification(dogorcat)
     mi_app = App(textimage, dogorcat)
+
     return 0
 
 if __name__ == '__main__':

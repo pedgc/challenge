@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from web3.exceptions import ContractLogicError
 from functools import partial
 from tkinter import *
 from tkinter import ttk
@@ -90,26 +90,43 @@ class App():
             bCancel.focus_set()
 
             self.root.wait_window(contestWindow)
+        except ContractLogicError as v:
+            print("\tERROR - AppUser/contest: \n"+str(v))
+            # print("ContractLogicError: ")
+            # message = v['message']
+            # error_code = v['error']
+            # error = "Incorrect Solution Format: "+str(message)+ "["+str(error_code)+"]"
+            # print("\tError: "+error)
+            # # error = "Incorrect Solution Format: "+str(v)
+            # self.errorNotif.showErrorNotif(error)
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "Contest")
 
     def validateAndContest(self, contestObject, valueSolution):
         try:
+            print("validateAndContest:")
             if (type(contestObject) is TextImage):
                 if (isinstance(valueSolution.get(), str)):
-                    print("TextImage Solution: "+str(valueSolution.get()))
                     contestObject.contest(str(valueSolution.get()))
             elif (type(contestObject) is DogsOrCats):
                 if (isinstance(valueSolution.get(), str)):
-                    print("DogsOrCats Solution: "+str(valueSolution.get()))
                     solution = valueSolution.get().split(',')
                     solution = list(map(int, solution))
                     contestObject.contest(solution)
         except ValueError as v:
-            error = "Incorrect Solution Format: "+str(v)
             self.errorNotif.showErrorNotif(error)
-        except Exception as e:
-            self.errorNotif.showUnexpErrorNotif(e, "validateAndContest")
+        except ContractLogicError as v:
+            print("\tERROR - AppUser/validateAndContest: \n"+str(v))
+            # print("ContractLogicError: ")
+            # message = v['message']
+            # error_code = v['error']
+            # error = "Incorrect Solution Format: "+str(message)+ "["+str(error_code)+"]"
+            # print("\tError: "+error)
+            # # error = "Incorrect Solution Format: "+str(v)
+            # self.errorNotif.showErrorNotif(error)
+        # except Exception as e:
+        #     self.errorNotif.showUnexpErrorNotif(e, "validateAndContest")
+        #     print(e)
 
 
     def info(self, contestObject):
@@ -119,10 +136,13 @@ class App():
 
             text_info = self.info_getName(contestObject)
             text_info += self.info_getStatus(contestObject)
-            text_info += "Prize: " + str(contestObject.getPrize()) + "\n"
-            text_info += "Prize Has Been Sent: " + str(contestObject.getPrizeHasBeenSent()) + "\n"
-            text_info += "Contesters: " + str(contestObject.getContesters()) + "\n"
-            text_info += "Admin: " + str(contestObject.getAdmin()) + "\n"
+            if (contestObject.getStatus()):
+                text_info += self.info_getPrize(contestObject)
+                text_info += self.info_getContesters(contestObject)
+                text_info += self.info_getWinners(contestObject)
+                if(contestObject.getWinners()):
+                    text_info += self.info_getPrizeHasBeenSent(contestObject)
+            text_info += self.info_getAdmin(contestObject)
 
             # Insert info in the textbox
             self.tinfo.insert("1.0", text_info)
@@ -145,4 +165,58 @@ class App():
                 resul = "The contest is ACTIVE\n"
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "info_getStatus")
+        return resul
+
+    def info_getPrize(self, contestObject):
+        resul = ""
+        try:
+            resul = "Prize: "+str(contestObject.getPrize())+" ETH\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getPrize")
+        return resul
+
+    def info_getContesters(self, contestObject):
+        resul = "There are no contesters yet\n"
+        try:
+            contesters = contestObject.getContesters()
+            if(contesters):
+                i = 1
+                resul = "Contesters ["+str(len(contesters))+"]\n"
+                for contester in contesters:
+                    resul += "\t"+str(i)+". "+str(contester)+"\n"
+                    i += 1
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getContesters")
+        return resul
+
+    def info_getWinners(self, contestObject):
+        resul = "Winners have not been selected yet\n"
+        try:
+            winners = contestObject.getWinners()
+            if(winners):
+                i = 1
+                resul = "Winners ["+str(len(winners))+"]\n"
+                for winner in winners:
+                    resul += "\t"+str(i)+". "+str(winner)+"\n"
+                    i += 1
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getWinners")
+        return resul
+
+    def info_getPrizeHasBeenSent(self, contestObject):
+        resul = "Prize has NOT been sent yet\n"
+        try:
+            winners = contestObject.getWinners()
+            if(contestObject.getPrizeHasBeenSent()):
+                resul = "Prize has been sent\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getPrizeHasBeenSent")
+        return resul
+
+    def info_getAdmin(self, contestObject):
+        resul = ""
+        try:
+            resul = "Admin: "+str(contestObject.getAdmin())+"\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getAdmin")
         return resul

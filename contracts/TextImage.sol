@@ -8,11 +8,11 @@ contract TextImage {
   address private admin;
   address payable[] private winners;
   address payable[] private contesters;
-  uint public prize;
-  bool public status;
-  bool public prizeHasBeenSent;
-  string public name;
-  mapping(address => uint256) public users;
+  uint private prize;
+  bool private status;
+  bool private prizeHasBeenSent;
+  string private name;
+  mapping(address => uint256) private users;
 
   constructor () public{
     admin = msg.sender;
@@ -39,11 +39,10 @@ function setName(string memory _name) public onlyAdmin{
   name = _name;
   emit Notification("The name has been changed correctly", msg.sender);
 }
-
 function getSolution() public view onlyAdmin returns(string memory){
   return solution;
 }
-function getWinners() public view onlyAdmin returns(address payable[] memory){
+function getWinners() public view returns(address payable[] memory){
   return winners;
 }
 function getAdmin() public view returns(address){
@@ -69,6 +68,7 @@ function getName() public view returns(string memory){
 
   function createContest(string memory _solution) public payable onlyAdmin{
     require(msg.value > 0, "Prize can not be 0");
+    require(!status, "You can not create a contest while there is an ongoing one");
 
     solution = _solution;
     status = true;
@@ -133,6 +133,7 @@ function getName() public view returns(string memory){
 // - - - - Participants - - - -
   function contest(string memory _resul) public{
     require(msg.sender != admin, "Admin is not allowed to be a contester");
+    require(winners.length == 0, "Contest period is over. Winners have been selected");
     require(status, "The contest is not active");
 
     users[msg.sender] = obtainScore(_resul, solution);
@@ -148,7 +149,7 @@ function getName() public view returns(string memory){
     uint length1 = bytes(_str1).length;
     uint length2 = bytes(_str2).length;
     uint n = max(length1, length2) + 1;
-    uint[20][] memory distance = new uint[20][](n);
+    uint[200][] memory distance = new uint[200][](n);
     bytes memory str1 = bytes(_str1);
     bytes memory str2 = bytes(_str2);
 

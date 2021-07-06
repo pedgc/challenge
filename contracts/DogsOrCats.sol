@@ -40,7 +40,7 @@ function setName(string memory _name) public onlyAdmin{
   emit Notification("The name has been changed correctly", msg.sender);
 }
 
-function getWinners() public view onlyAdmin returns(address payable[] memory){
+function getWinners() public view returns(address payable[] memory){
   return winners;
 }
 function getSolution() public view onlyAdmin returns(uint[] memory){
@@ -69,6 +69,7 @@ function getName() public view returns(string memory){
 
   function createContest(uint[] memory _solution) public payable onlyAdmin{
     require(msg.value > 0, "Prize can not be 0");
+    require(!status, "You can not create a contest while there is an ongoing one");
 
     solution = _solution;
     status = true;
@@ -133,6 +134,7 @@ function getName() public view returns(string memory){
 // - - - - Participants - - - -
   function contest(uint[] memory _resul) public{
     require(msg.sender != admin, "Admin is not allowed to be a contester");
+    require(winners.length == 0, "Contest period is over. Winners have been selected");
     require(_resul.length == solution.length, "The dataset length is not correct");
     require(status, "The contest is not active");
 

@@ -15,13 +15,13 @@ class App():
         self.errorNotif = ErrorNotification()
         # Main Window
         self.root = Tk()
-        self.root.geometry('600x500')
+        self.root.geometry('650x500')
         self.root.resizable(width=True,height=True)
         self.root.title('Admin')
 
         # = = = = = = Widget Functionality = = = = = = = =
         # Information Field
-        self.tinfo = Text(self.root, width=70, height=20)
+        self.tinfo = Text(self.root, width=75, height=20)
         self.separator1 = ttk.Separator(self.root, orient=HORIZONTAL)
 
         # Image Text Contest Buttons
@@ -29,7 +29,6 @@ class App():
         self.binfo_text = ttk.Button(self.textFrame, text='Info', command=partial(self.info, textImage))
         self.bSetContest_text = ttk.Button(self.textFrame, text='Set Contest', command=partial(self.setContest, textImage))
         self.bResetContest_text = ttk.Button(self.textFrame, text='Reset Contest', command=textImage.resetContest)
-        self.bSetName_text = ttk.Button(self.textFrame, text='Set Contest Name', command=partial(self.setName, textImage))
         self.bSetAdmin_text = ttk.Button(self.textFrame, text='Set Contract Admin', command=partial(self.setAddress, textImage))
         self.bCalculateWinners_text = ttk.Button(self.textFrame, text='Calculate Winner/s', command=textImage.calculateWinners)
         self.bSendPrize_text = ttk.Button(self.textFrame, text='Send Prize', command=textImage.sendPrizeToWinners)
@@ -40,7 +39,6 @@ class App():
         self.binfo_DoC = ttk.Button(self.DoCFrame, text='Info', command=partial(self.info, dogsOrCats))
         self.bSetContest_DoC = ttk.Button(self.DoCFrame, text='Set Contest', command=partial(self.setContest, dogsOrCats))
         self.bResetContest_DoC = ttk.Button(self.DoCFrame, text='Reset Contest', command=dogsOrCats.resetContest)
-        self.bSetName_DoC = ttk.Button(self.DoCFrame, text='Set Contest Name', command=partial(self.setName, dogsOrCats))
         self.bSetAdmin_DoC = ttk.Button(self.DoCFrame, text='Set Contract Admin', command=partial(self.setAddress, dogsOrCats))
         self.bCalculateWinners_DoC = ttk.Button(self.DoCFrame, text='Calculate Winner/s', command=dogsOrCats.calculateWinners)
         self.bSendPrize_DoC = ttk.Button(self.DoCFrame, text='Send Prize', command=dogsOrCats.sendPrizeToWinners)
@@ -61,7 +59,6 @@ class App():
         self.bResetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
         self.bCalculateWinners_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
         self.bSendPrize_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bSetName_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
         self.bSetAdmin_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.separator2.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
 
@@ -72,7 +69,6 @@ class App():
         self.bResetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
         self.bCalculateWinners_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
         self.bSendPrize_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bSetName_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
         self.bSetAdmin_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.separator3.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
 
@@ -115,35 +111,6 @@ class App():
             self.root.wait_window(setContestWindow)
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "setContest")
-
-    # Set Contest Name Window
-    def setName(self, contestObject):
-        try:
-            setNameWindow = Toplevel()
-            setNameWindow.geometry('300x120')
-            setNameWindow.resizable(width=True,height=True)
-            setNameWindow.title("Set Contest Name")
-            setNameWindow.transient(master=self.root)
-            setNameWindow.grab_set()
-
-            Name = StringVar()
-            labelName = ttk.Label(setNameWindow, text="New Name:")
-            valueName = ttk.Entry(setNameWindow, width=30)
-            separ1 = ttk.Separator(setNameWindow, orient=HORIZONTAL)
-
-            bChange = ttk.Button(setNameWindow, text="Change Name", command=lambda : contestObject.setName(valueName.get()))
-            bCancel = ttk.Button(setNameWindow, text='Cancel', command=setNameWindow.destroy)
-
-            labelName.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
-            valueName.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
-            separ1.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
-            bChange.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
-            bCancel.pack(side=RIGHT, fill=BOTH, expand=True, padx=5, pady=5)
-            bCancel.focus_set()
-
-            self.root.wait_window(setNameWindow)
-        except Exception as e:
-            self.errorNotif.showUnexpErrorNotif(e, "setName")
 
     # Set Contract Admin Address Window
     def setAddress(self, contestObject):
@@ -188,8 +155,8 @@ class App():
         except ValueError as v:
             error = "Incorrect Solution Format: "+str(v)
             self.errorNotif.showErrorNotif(error)
-        except Exception as e:
-            self.errorNotif.showUnexpErrorNotif(e, "validateAndCreate")
+        # except Exception as e:
+        #     self.errorNotif.showUnexpErrorNotif(e, "validateAndCreate")
 
 
     def info(self, contestObject):
@@ -210,16 +177,89 @@ class App():
 
             text_info = adminInfo
             text_info += "Solution: " + str(contestObject.getSolution()) + "\n"
-            text_info += "Winners: " + str(contestObject.getWinners()) + "\n"
             text_info += userInfo
-            text_info += "Name: " + str(contestObject.getName()) + "\n"
-            text_info += "Status: " + str(contestObject.getStatus()) + "\n"
-            text_info += "Prize: " + str(contestObject.getPrize()) + "\n"
-            text_info += "Prize Has Been Sent: " + str(contestObject.getPrizeHasBeenSent()) + "\n"
-            text_info += "Contesters: " + str(contestObject.getContesters()) + "\n"
-            text_info += "Admin: " + str(contestObject.getAdmin()) + "\n"
+            text_info += self.info_getName(contestObject)
+            text_info += self.info_getStatus(contestObject)
+            text_info += self.info_getPrize(contestObject)
+            text_info += self.info_getContesters(contestObject)
+            text_info += self.info_getWinners(contestObject)
+            text_info += self.info_getPrizeHasBeenSent(contestObject)
+            text_info += self.info_getAdmin(contestObject)
 
             # Insert info in the textbox
             self.tinfo.insert("1.0", text_info)
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "info")
+
+
+    def info_getName(self, contestObject):
+        resul = ""
+        try:
+            resul = "\t"+str(contestObject.getName())+"\n"
+            resul = resul.upper()
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getName")
+        return resul
+
+    def info_getStatus(self, contestObject):
+        resul = "The contest is NOT active\n"
+        try:
+            if (contestObject.getStatus()):
+                resul = "The contest is ACTIVE\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getStatus")
+        return resul
+
+    def info_getPrize(self, contestObject):
+        resul = ""
+        try:
+            resul = "Prize: "+str(contestObject.getPrize())+" ETH\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getPrize")
+        return resul
+
+    def info_getContesters(self, contestObject):
+        resul = "There are no contesters yet\n"
+        try:
+            contesters = contestObject.getContesters()
+            if(contesters):
+                i = 1
+                resul = "Contesters ["+str(len(contesters))+"]\n"
+                for contester in contesters:
+                    resul += "\t"+str(i)+". "+str(contester)+"\n"
+                    i += 1
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getContesters")
+        return resul
+
+    def info_getWinners(self, contestObject):
+        resul = "Winners have not been selected yet\n"
+        try:
+            winners = contestObject.getWinners()
+            if(winners):
+                i = 1
+                resul = "Winners ["+str(len(winners))+"]\n"
+                for winner in winners:
+                    resul += "\t"+str(i)+". "+str(winner)+"\n"
+                    i += 1
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getWinners")
+        return resul
+
+    def info_getPrizeHasBeenSent(self, contestObject):
+        resul = "Prize has NOT been sent yet\n"
+        try:
+            winners = contestObject.getWinners()
+            if(contestObject.getPrizeHasBeenSent()):
+                resul = "Prize has been sent\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getPrizeHasBeenSent")
+        return resul
+
+    def info_getAdmin(self, contestObject):
+        resul = ""
+        try:
+            resul = "Admin: "+str(contestObject.getAdmin())+"\n"
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "info_getAdmin")
+        return resul
