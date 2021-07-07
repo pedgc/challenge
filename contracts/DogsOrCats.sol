@@ -3,16 +3,15 @@ pragma solidity ^0.5.0;
 contract DogsOrCats {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
-  //State variables -> Permanently saved in the contract
-  uint[] private solution;
-  address private admin;
-  address payable[] private winners;
-  address payable[] private contesters;
-  uint private prize;
-  bool private status;
-  bool private prizeHasBeenSent;
-  string private name;
-  mapping(address => uint256) private users;
+  uint[] private solution;                    // Correct answer of the contest
+  address private admin;                      // Address of the contract Owner
+  address payable[] private winners;          // List of the winners of the contest
+  address payable[] private contesters;       // List of the contesters
+  uint private prize;                         // Prize amount (in Wei)
+  bool private status;                        // The contest is Active or Inactive
+  bool private prizeHasBeenSent;              // To check if the prize has been sent to winners
+  string private name;                        // Contest name
+  mapping(address => uint256) private users;  // All users of all contests
 
   constructor () public{
     admin = msg.sender;
@@ -29,22 +28,20 @@ contract DogsOrCats {
 
   // - - - - Event - - - -
   event Notification(string _notif, address _sender);
+
 /* = = = = = = = FUNCTIONS = = = = = = = */
 // - - - - Getters & Setters - - - -
 function setAdmin(address _newAdmin) public onlyAdmin{
   admin = _newAdmin;
   emit Notification("The admin has been changed correctly", msg.sender);
 }
-function setName(string memory _name) public onlyAdmin{
-  name = _name;
-  emit Notification("The name has been changed correctly", msg.sender);
-}
 
-function getWinners() public view returns(address payable[] memory){
-  return winners;
-}
+
 function getSolution() public view onlyAdmin returns(uint[] memory){
   return solution;
+}
+function getWinners() public view returns(address payable[] memory){
+  return winners;
 }
 function getAdmin() public view returns(address){
   return admin;
@@ -102,6 +99,25 @@ function getName() public view returns(string memory){
     emit Notification("The winner/s has/have been calculated correctly", msg.sender);
   }
 
+  // If the contester cheated, it can be expelled
+  function expelWinner(address _winner) public onlyAdmin{
+    require(winners.length >= 1, "We should have at least 1 winner");
+    require(prizeHasBeenSent == false, "Too late, the prize has already been sent");
+
+    uint i;
+    bool flag = true;
+
+    for(i = 0; (i < winners.length) && flag; i++){
+      if(winners[i] == _winner) {
+        delete winners[i];
+        winners[i] = winners[winners.length - 1];
+        winners.length--;
+        flag = false;
+        emit Notification("The winner has been expelled", msg.sender);
+      }
+    }
+  }
+
   function sendPrizeToWinners() public payable onlyAdmin{
     require(winners.length >= 1, "We should have at least 1 winner");
     require(prizeHasBeenSent == false, "The prize has already been sent");
@@ -117,7 +133,6 @@ function getName() public view returns(string memory){
     emit Notification("The prize has been sent to the winner/s", msg.sender);
   }
 
-  // - - - - - - - Reset Contest - - - - - - - -
   function resetContest() public onlyAdmin{
     require(prizeHasBeenSent == true, "You can not reset the contest without sending prize to winner/s");
 
@@ -132,7 +147,7 @@ function getName() public view returns(string memory){
   }
 
 
-// - - - - Participants - - - -
+// - - - - Contesters - - - -
   function contest(uint[] memory _resul) public{
     require(msg.sender != admin, "Admin is not allowed to be a contester");
     require(winners.length == 0, "Contest period is over. Winners have been selected");
@@ -147,8 +162,8 @@ function getName() public view returns(string memory){
     emit Notification("Your solution has been sent", msg.sender);
   }
 
+  // The lower the score, the better
   function obtainScore(uint[] memory _resul) private view returns(uint256){
-
     uint score = 0;
     uint length = solution.length;
 

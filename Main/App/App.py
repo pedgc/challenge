@@ -9,7 +9,9 @@ from ContractInteraction import DogsOrCatsContract, TextImageContract, Notificat
 from DogsOrCatsContract import DogsOrCats
 from TextImageContract import TextImage
 from Notifications import Notification, ErrorNotification
-
+import os
+CWD = os.getcwd()
+L_PATH = CWD + '/App/Icons/App_Logo.png'
 
 class App():
     def __init__(self, textImage, dogsOrCats):
@@ -21,6 +23,8 @@ class App():
         self.root.geometry('570x590')
         self.root.resizable(width=True,height=True)
         self.root.title('Admin')
+        logo = PhotoImage(file = L_PATH)
+        self.root.iconphoto(False, logo)
 
         # = = = = = = Widget Functionality = = = = = = = =
         # Information Field

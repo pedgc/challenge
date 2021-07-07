@@ -4,11 +4,12 @@
 from functools import partial
 from tkinter import *
 from tkinter import ttk
-# from ttkthemes import ThemedTk
 from ttkbootstrap import Style
 from ContractInteraction import Notifications
 from Notifications import Notification, ErrorNotification, InvalidLengthError
-
+import os
+CWD = os.getcwd()
+L_PATH = CWD + '/App/Icons/App_Logo.png'
 
 class Authentication():
     def __init__(self):
@@ -17,20 +18,13 @@ class Authentication():
     def obtainPrivateKey(self):
         try:
             # Main Window
-            # self.root = Tk()
-            # self.root = ThemedTk(theme="breeze")
-            # self.root = ThemedTk(theme="yaru")
             style = Style(theme="flatly")
-            # self.root = Tk()
             self.root = style.master
             self.root.geometry('400x110')
             self.root.resizable(width=True,height=True)
             self.root.title('Authentication')
-
-            # self.root['bg'] = "#f2f2f2"
-            # style = ttk.Style(self.root)
-            # style.configure("TLabel", background="#f2f2f2")
-            # style.configure("TButton", background="#f4f6f6")
+            logo = PhotoImage(file = L_PATH)
+            self.root.iconphoto(False, logo)
 
             # = = = = = = Widget Functionality = = = = = = = =
             privateKey = StringVar()
@@ -38,14 +32,17 @@ class Authentication():
             self.valuePrivKey = ttk.Entry(self.root, textvariable=privateKey, width=30)
             self.separ1 = ttk.Separator(self.root, orient=HORIZONTAL)
 
-            self.bOK = ttk.Button(self.root, text="Use this Private Key", command=partial(self.validate, self.valuePrivKey) )
+            self.bOK = ttk.Button(self.root, text="Use this Private Key", style="success.TButton", command=partial(self.validate, self.valuePrivKey))
+            self.bCancel = ttk.Button(self.root, text="Cancel", style="secondary.TButton", command=self.root.destroy)
 
-            self.labelPrivKey.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
-            self.valuePrivKey.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
+            self.labelPrivKey.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=2)
+            self.valuePrivKey.pack(side=TOP, fill=X, expand=True, padx=5, pady=2)
             self.separ1.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
-            self.bOK.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
+            self.bOK.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=5)
+            self.bCancel.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=5)
 
             self.root.mainloop()
+            # self.root.iconbitmap('App/Icons/App_Logo.ico')
 
             resul = hex(int("0x"+privateKey.get(), 16))
         except Exception as e:

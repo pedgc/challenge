@@ -6,8 +6,10 @@ from plyer import notification
 from threading import Thread
 from datetime import datetime
 import time
-# import asyncio
 from colorama import Fore, Back, init
+import os
+
+
 
 POLL_INTERVAL = 5
 #- - - - Pretty Print - - - -
@@ -16,6 +18,11 @@ TSTAMP = Fore.BLACK
 FNAME = Fore.YELLOW
 EXCEPTION = Fore.BLUE
 OK = Fore.GREEN
+#- - - - - Icons - - - - -
+CWD = os.getcwd()
+W_ICON = CWD + '/App/Icons/waiting.png'
+S_ICON = CWD + '/App/Icons/success.png'
+E_ICON = CWD + '/App/Icons/error.png'
 
 
 class Notification():
@@ -34,7 +41,7 @@ class Notification():
             title='Notification',
             message="Waiting for the transaction to be mined. Please read cmd to obtain more info",
             app_name='Text Challenge',
-            app_icon='path/to/the/icon.png'
+            app_icon=W_ICON
         )
         event_received = False
         i = 0
@@ -51,7 +58,7 @@ class Notification():
                         title='Notification',
                         message=message,
                         app_name='Text Challenge',
-                        app_icon='path/to/the/icon.png'
+                        app_icon=S_ICON
                     )
                     print(OK+message)
                 else:
@@ -62,7 +69,7 @@ class Notification():
                         title='Notification',
                         message=message,
                         app_name='Text Challenge',
-                        app_icon='path/to/the/icon.png'
+                        app_icon=E_ICON
                     )
                     print(ERROR+"\nTRANSACTION REVERTED")
                     print(EXCEPTION+message)
@@ -84,7 +91,7 @@ class ErrorNotification():
             title='Error',
             message=error,
             app_name='Text Challenge',
-            app_icon='path/to/the/icon.png'
+            app_icon=E_ICON
         )
         print(ERROR+"\nERROR")
         print(TSTAMP+"<"+str(datetime.now().strftime("%H:%M:%S.%f"))+"> "+FNAME+"["+f_name+"]")
@@ -95,7 +102,7 @@ class ErrorNotification():
             title='Error',
             message='Unexpected Error: Please read command line to obtain more info',
             app_name='Text Challenge',
-            app_icon='path/to/the/icon.png'
+            app_icon=E_ICON
         )
         print(ERROR+"\nERROR")
         print(TSTAMP+"<"+str(datetime.now().strftime("%H:%M:%S.%f"))+"> "+FNAME+"["+f_name+"]")
