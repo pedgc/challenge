@@ -4,8 +4,9 @@ from web3.exceptions import ContractLogicError
 from functools import partial
 from tkinter import *
 from tkinter import ttk
+from ttkbootstrap import Style
 import sys
-sys.path.insert(0, 'App/ContractInteraction')
+# sys.path.insert(0, 'App/ContractInteraction')
 from ContractInteraction import DogsOrCatsContract, TextImageContract, Notifications
 from DogsOrCatsContract import DogsOrCats
 from TextImageContract import TextImage
@@ -15,8 +16,10 @@ from Notifications import Notification, ErrorNotification
 class App():
     def __init__(self, textImage, dogsOrCats):
         self.errorNotif = ErrorNotification()
+
         # Main Window
-        self.root = Tk()
+        style = Style(theme="flatly")
+        self.root = style.master
         self.root.geometry('500x400')
         self.root.resizable(width=True,height=True)
         self.root.title('User')
@@ -24,42 +27,42 @@ class App():
         # = = = = = = Widget Functionality = = = = = = = =
         # Information Field
         self.tinfo = Text(self.root, width=60, height=15)
-        self.separator1 = ttk.Separator(self.root, orient=HORIZONTAL)
 
         # Image Text Contest Buttons
-        self.textFrame = ttk.Frame(self.root)
-        self.binfo_text = ttk.Button(self.textFrame, text='Info', command=partial(self.info, textImage))
-        self.bContest_text = ttk.Button(self.textFrame, text='Send Result', command=partial(self.Contest, textImage))
-        self.separator2 = ttk.Separator(self.root, orient=HORIZONTAL)
+        self.textFrame = ttk.LabelFrame(self.root, text=' Text from Image ')
+        self.innerFrame1_text = ttk.Frame(self.textFrame)
+        self.binfo_text = ttk.Button(self.innerFrame1_text, text='Info', style="info.Outline.TButton", command=partial(self.info, textImage))
+        self.bContest_text = ttk.Button(self.innerFrame1_text, text='Send Result', command=partial(self.Contest, textImage))
 
         # Dog Or Cat Contest Buttons
-        self.DoCFrame = ttk.Frame(self.root)
-        self.binfo_DoC = ttk.Button(self.DoCFrame, text='Info', command=partial(self.info, dogsOrCats))
-        self.bContest_DoC = ttk.Button(self.DoCFrame, text='Send Result', command=partial(self.Contest, dogsOrCats))
+        self.DoCFrame = ttk.LabelFrame(self.root, text=' Dog or Cat ')
+        self.innerFrame1_DoC = ttk.Frame(self.DoCFrame)
+        self.binfo_DoC = ttk.Button(self.innerFrame1_DoC, text='Info', style="info.Outline.TButton", command=partial(self.info, dogsOrCats))
+        self.bContest_DoC = ttk.Button(self.innerFrame1_DoC, text='Send Result', command=partial(self.Contest, dogsOrCats))
         self.separator3 = ttk.Separator(self.root, orient=HORIZONTAL)
 
         # Exit Button
-        self.bExit = ttk.Button(self.root, text='Exit', command=self.root.destroy)
+        self.bExit = ttk.Button(self.root, text='Exit', style="secondary.TButton", command=self.root.destroy)
 
         # = = = = = = Widget Placement = = = = = = = =
         # Information Field
-        self.tinfo.pack(side=TOP)
-        self.separator1.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
+        self.tinfo.pack(side=TOP, pady=4)
 
         # Image Text Contest Buttons
-        self.textFrame.pack(side=TOP, fill=BOTH, expand=True)
+        self.textFrame.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=8)
+        self.innerFrame1_text.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=1)
         self.binfo_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.bContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
-        self.separator2.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
 
         # Dog Or Cat Contest Buttons
-        self.DoCFrame.pack(side=TOP, fill=BOTH, expand=True)
+        self.DoCFrame.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=8)
+        self.innerFrame1_DoC.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=1)
         self.binfo_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.bContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
         self.separator3.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
 
         # Exit Button
-        self.bExit.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=0)
+        self.bExit.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=2)
 
         # = = = = = = = = = = = = = =
         self.binfo_text.focus_set()
@@ -79,8 +82,8 @@ class App():
             valueSolution = ttk.Entry(contestWindow, width=30)
             separ1 = ttk.Separator(contestWindow, orient=HORIZONTAL)
 
-            bSend = ttk.Button(contestWindow, text="Send", command=partial(self.validateAndContest, contestObject, valueSolution) )
-            bCancel = ttk.Button(contestWindow, text='Cancel', command=contestWindow.destroy)
+            bSend = ttk.Button(contestWindow, text="Send", style="success.TButton", command=partial(self.validateAndContest, contestObject, valueSolution) )
+            bCancel = ttk.Button(contestWindow, text='Cancel', style="secondary.TButton", command=contestWindow.destroy)
 
             labelSolution.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
             valueSolution.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
@@ -90,15 +93,6 @@ class App():
             bCancel.focus_set()
 
             self.root.wait_window(contestWindow)
-        except ContractLogicError as v:
-            print("\tERROR - AppUser/contest: \n"+str(v))
-            # print("ContractLogicError: ")
-            # message = v['message']
-            # error_code = v['error']
-            # error = "Incorrect Solution Format: "+str(message)+ "["+str(error_code)+"]"
-            # print("\tError: "+error)
-            # # error = "Incorrect Solution Format: "+str(v)
-            # self.errorNotif.showErrorNotif(error)
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "Contest")
 
@@ -115,18 +109,9 @@ class App():
                     contestObject.contest(solution)
         except ValueError as v:
             self.errorNotif.showErrorNotif(error)
-        except ContractLogicError as v:
-            print("\tERROR - AppUser/validateAndContest: \n"+str(v))
-            # print("ContractLogicError: ")
-            # message = v['message']
-            # error_code = v['error']
-            # error = "Incorrect Solution Format: "+str(message)+ "["+str(error_code)+"]"
-            # print("\tError: "+error)
-            # # error = "Incorrect Solution Format: "+str(v)
-            # self.errorNotif.showErrorNotif(error)
-        # except Exception as e:
-        #     self.errorNotif.showUnexpErrorNotif(e, "validateAndContest")
-        #     print(e)
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "validateAndContest")
+            print(e)
 
 
     def info(self, contestObject):
@@ -152,12 +137,14 @@ class App():
     def info_getName(self, contestObject):
         resul = ""
         try:
-            resul = "\t"+str(contestObject.getName())+"\n"
+            resul = "\t\t  "+str(contestObject.getName())+"\n"
             resul = resul.upper()
+            resul += "\t\t---------------------------------------------\n\n"
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "info_getName")
         return resul
 
+    # PENDING: Catch asyncio.exceptions.TimeoutError
     def info_getStatus(self, contestObject):
         resul = "The contest is NOT active\n"
         try:

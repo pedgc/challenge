@@ -4,6 +4,8 @@
 from functools import partial
 from tkinter import *
 from tkinter import ttk
+# from ttkthemes import ThemedTk
+from ttkbootstrap import Style
 from ContractInteraction import Notifications
 from Notifications import Notification, ErrorNotification, InvalidLengthError
 
@@ -15,10 +17,20 @@ class Authentication():
     def obtainPrivateKey(self):
         try:
             # Main Window
-            self.root = Tk()
+            # self.root = Tk()
+            # self.root = ThemedTk(theme="breeze")
+            # self.root = ThemedTk(theme="yaru")
+            style = Style(theme="flatly")
+            # self.root = Tk()
+            self.root = style.master
             self.root.geometry('400x110')
             self.root.resizable(width=True,height=True)
             self.root.title('Authentication')
+
+            # self.root['bg'] = "#f2f2f2"
+            # style = ttk.Style(self.root)
+            # style.configure("TLabel", background="#f2f2f2")
+            # style.configure("TButton", background="#f4f6f6")
 
             # = = = = = = Widget Functionality = = = = = = = =
             privateKey = StringVar()

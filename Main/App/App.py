@@ -4,6 +4,7 @@
 from functools import partial
 from tkinter import *
 from tkinter import ttk
+from ttkbootstrap import Style
 from ContractInteraction import DogsOrCatsContract, TextImageContract, Notifications
 from DogsOrCatsContract import DogsOrCats
 from TextImageContract import TextImage
@@ -13,67 +14,79 @@ from Notifications import Notification, ErrorNotification
 class App():
     def __init__(self, textImage, dogsOrCats):
         self.errorNotif = ErrorNotification()
+
         # Main Window
-        self.root = Tk()
-        self.root.geometry('650x500')
+        style = Style(theme="flatly")
+        self.root = style.master
+        self.root.geometry('570x590')
         self.root.resizable(width=True,height=True)
         self.root.title('Admin')
 
         # = = = = = = Widget Functionality = = = = = = = =
         # Information Field
         self.tinfo = Text(self.root, width=75, height=20)
-        self.separator1 = ttk.Separator(self.root, orient=HORIZONTAL)
 
         # Image Text Contest Buttons
-        self.textFrame = ttk.Frame(self.root)
-        self.binfo_text = ttk.Button(self.textFrame, text='Info', command=partial(self.info, textImage))
-        self.bSetContest_text = ttk.Button(self.textFrame, text='Set Contest', command=partial(self.setContest, textImage))
-        self.bResetContest_text = ttk.Button(self.textFrame, text='Reset Contest', command=textImage.resetContest)
-        self.bSetAdmin_text = ttk.Button(self.textFrame, text='Set Contract Admin', command=partial(self.setAddress, textImage))
-        self.bCalculateWinners_text = ttk.Button(self.textFrame, text='Calculate Winner/s', command=textImage.calculateWinners)
-        self.bSendPrize_text = ttk.Button(self.textFrame, text='Send Prize', command=textImage.sendPrizeToWinners)
-        self.separator2 = ttk.Separator(self.root, orient=HORIZONTAL)
+        self.textFrame = ttk.LabelFrame(self.root, text=' Text from Image ')
+        self.innerFrame1_text = ttk.Frame(self.textFrame)
+        self.binfo_text = ttk.Button(self.innerFrame1_text, text='Info', style="info.Outline.TButton", command=partial(self.info, textImage))
+        self.bSetContest_text = ttk.Button(self.innerFrame1_text, text='Set Contest', command=partial(self.setContest, textImage))
+        self.bResetContest_text = ttk.Button(self.innerFrame1_text, text='Reset Contest', style="primary.TButton", command=textImage.resetContest)
+        self.bSetAdmin_text = ttk.Button(self.innerFrame1_text, text='Set Contract Admin', command=partial(self.setAddress, textImage))
+        self.bCalculateWinners_text = ttk.Button(self.innerFrame1_text, text='Calculate Winner/s', command=textImage.calculateWinners)
+        self.bSendPrize_text = ttk.Button(self.innerFrame1_text, text='Send Prize', style="primary.TButton", command=textImage.sendPrizeToWinners)
+        self.innerFrame2_text = ttk.Frame(self.textFrame)
+        self.bExpelWinner_text = ttk.Button(self.innerFrame2_text, text='Expel Winner', style="warning.TButton", command=textImage.sendPrizeToWinners)
+        self.bSetAdmin_text = ttk.Button(self.innerFrame2_text, text='Set New Admin', style="danger.TButton", command=textImage.sendPrizeToWinners)
 
         # Dog Or Cat Contest Buttons
-        self.DoCFrame = ttk.Frame(self.root)
-        self.binfo_DoC = ttk.Button(self.DoCFrame, text='Info', command=partial(self.info, dogsOrCats))
-        self.bSetContest_DoC = ttk.Button(self.DoCFrame, text='Set Contest', command=partial(self.setContest, dogsOrCats))
-        self.bResetContest_DoC = ttk.Button(self.DoCFrame, text='Reset Contest', command=dogsOrCats.resetContest)
-        self.bSetAdmin_DoC = ttk.Button(self.DoCFrame, text='Set Contract Admin', command=partial(self.setAddress, dogsOrCats))
-        self.bCalculateWinners_DoC = ttk.Button(self.DoCFrame, text='Calculate Winner/s', command=dogsOrCats.calculateWinners)
-        self.bSendPrize_DoC = ttk.Button(self.DoCFrame, text='Send Prize', command=dogsOrCats.sendPrizeToWinners)
+        self.DoCFrame = ttk.LabelFrame(self.root, text=' Dog or Cat ')
+        self.innerFrame1_DoC = ttk.Frame(self.DoCFrame)
+        self.binfo_DoC = ttk.Button(self.innerFrame1_DoC, text='Info', style="info.Outline.TButton", command=partial(self.info, dogsOrCats))
+        self.bSetContest_DoC = ttk.Button(self.innerFrame1_DoC, text='Set Contest', command=partial(self.setContest, dogsOrCats))
+        self.bResetContest_DoC = ttk.Button(self.innerFrame1_DoC, text='Reset Contest', command=dogsOrCats.resetContest)
+        self.bSetAdmin_DoC = ttk.Button(self.innerFrame1_DoC, text='Set Contract Admin', command=partial(self.setAddress, dogsOrCats))
+        self.bCalculateWinners_DoC = ttk.Button(self.innerFrame1_DoC, text='Calculate Winner/s', command=dogsOrCats.calculateWinners)
+        self.bSendPrize_DoC = ttk.Button(self.innerFrame1_DoC, text='Send Prize', command=dogsOrCats.sendPrizeToWinners)
+        self.innerFrame2_DoC = ttk.Frame(self.DoCFrame)
         self.separator3 = ttk.Separator(self.root, orient=HORIZONTAL)
+        self.bExpelWinner_DoC = ttk.Button(self.innerFrame2_DoC, text='Expel Winner', style="warning.TButton", command=dogsOrCats.sendPrizeToWinners)
+        self.bSetAdmin_DoC = ttk.Button(self.innerFrame2_DoC, text='Set New Admin', style="danger.TButton", command=dogsOrCats.sendPrizeToWinners)
 
         # Exit Button
-        self.bExit = ttk.Button(self.root, text='Exit', command=self.root.destroy)
+        self.bExit = ttk.Button(self.root, text='Exit', style="secondary.TButton", command=self.root.destroy)
 
         # = = = = = = Widget Placement = = = = = = = =
         # Information Field
-        self.tinfo.pack(side=TOP)
-        self.separator1.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
+        self.tinfo.pack(side=TOP, pady=4)
 
         # Image Text Contest Buttons
-        self.textFrame.pack(side=TOP, fill=BOTH, expand=True)
-        self.binfo_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
-        self.bSetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bResetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bCalculateWinners_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bSendPrize_text.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bSetAdmin_text.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
-        self.separator2.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
+        self.textFrame.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=8)
+        self.innerFrame1_text.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=1)
+        self.binfo_text.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bSetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bResetContest_text.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bCalculateWinners_text.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bSendPrize_text.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.innerFrame2_text.pack(side=BOTTOM, fill=BOTH, expand=True, padx=0, pady=1)
+        self.bExpelWinner_text.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bSetAdmin_text.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
 
         # Dog Or Cat Contest Buttons
-        self.DoCFrame.pack(side=TOP, fill=BOTH, expand=True)
-        self.binfo_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
-        self.bSetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bResetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bCalculateWinners_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bSendPrize_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=0, pady=0)
-        self.bSetAdmin_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=0)
+        self.DoCFrame.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=8)
+        self.innerFrame1_DoC.pack(side=TOP, fill=BOTH, expand=True, padx=0, pady=1)
+        self.binfo_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bSetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bResetContest_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bCalculateWinners_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bSendPrize_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.innerFrame2_DoC.pack(side=BOTTOM, fill=BOTH, expand=True, padx=1, pady=1)
+        self.bExpelWinner_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
+        self.bSetAdmin_DoC.pack(side=LEFT, fill=BOTH, expand=True, padx=1, pady=0)
         self.separator3.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=1)
 
         # Exit Button
-        self.bExit.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=0)
+        self.bExit.pack(side=TOP, fill=BOTH, expand=True, padx=2, pady=2)
 
         # = = = = = = = = = = = = = =
         self.binfo_text.focus_set()
@@ -96,8 +109,8 @@ class App():
             valueSolution = ttk.Entry(setContestWindow, width=30)
             separ1 = ttk.Separator(setContestWindow, orient=HORIZONTAL)
 
-            bCreate = ttk.Button(setContestWindow, text="Create", command=partial(self.validateAndCreate, contestObject, prize, valueSolution) )
-            bCancel = ttk.Button(setContestWindow, text='Cancel', command=setContestWindow.destroy)
+            bCreate = ttk.Button(setContestWindow, text="Create", style="success.TButton", command=partial(self.validateAndCreate, contestObject, prize, valueSolution) )
+            bCancel = ttk.Button(setContestWindow, text='Cancel', style="secondary.TButton", command=setContestWindow.destroy)
 
             labelPrize.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
             valuePrize.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
@@ -155,8 +168,8 @@ class App():
         except ValueError as v:
             error = "Incorrect Solution Format: "+str(v)
             self.errorNotif.showErrorNotif(error)
-        # except Exception as e:
-        #     self.errorNotif.showUnexpErrorNotif(e, "validateAndCreate")
+        except Exception as e:
+            self.errorNotif.showUnexpErrorNotif(e, "validateAndCreate")
 
 
     def info(self, contestObject):
@@ -165,14 +178,12 @@ class App():
             self.tinfo.delete("1.0", END)
 
             adminInfo = """
-= = = = = = = = = = =
-= ADMIN INFORMATION =
-= = = = = = = = = = =
+\t\t   ADMIN INFORMATION
+\t\t-----------------------------------------
 """
             userInfo = """
-= = = = = = = = = = =
-= USER INFORMATION  =
-= = = = = = = = = = =
+\t\t   USER INFORMATION
+\t\t----------------------------------------
 """
 
             text_info = adminInfo

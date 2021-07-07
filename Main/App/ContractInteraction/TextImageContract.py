@@ -35,10 +35,10 @@ class TextImage():
         self.contract = self.w3.eth.contract(address=CONTRACT_ADDR, abi=self.abi)
         self.private_key = private_key
         self.myAccount = self.w3.eth.account.from_key(private_key).address
-        self.node_http = NODE_HTTP
+        # self.node_http = NODE_HTTP
         self.contract_addr = CONTRACT_ADDR
         self.errorNotif = ErrorNotification()
-        self.Notif = Notification(self) # -> Falta el parametro
+        self.Notif = Notification(self) 
         print("My Address: "+str(self.myAccount))
 
     # - - - - - - Getters & Setters - - - - - - - -
@@ -57,21 +57,14 @@ class TextImage():
     def setAdmin(self, newAdminAddr):
         try:
             print("SetAdmin\n\tNew Address: " + newAdminAddr)
-            self.contract.functions.setAdmin(newAdminAddr).transact(self.createTx(self.myAccount, 0))
+            # self.contract.functions.setAdmin(newAdminAddr).transact(self.createTx(self.myAccount, 0))
+            tx = self.contract.functions.setAdmin(newAdminAddr).buildTransaction(self.createTx(0))
+            self.signTxAndWaitNotif(tx)
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "setAdmin")
-
-    def setName(self, newName):
-        try:
-            self.contract.functions.setName(newName).transact(self.createTx(self.myAccount, 0))
-        except ValueError as v:
-            dict = literal_eval(str(v))
-            self.errorNotif.showErrorNotif(str(dict['message']))
-        except Exception as e:
-            self.errorNotif.showUnexpErrorNotif(e, "setName")
 
     # Users
     def getStatus(self):
@@ -113,14 +106,6 @@ class TextImage():
             self.errorNotif.showUnexpErrorNotif(e, "getPrizeHasBeenSent")
 
     # - - - - - - - - Methods - - - - - - - -
-    # def createTx(self, _from, _value):
-    #     tx = {
-    #         'gas': GAS,
-    #         'gasPrice': GAS_PRICE,
-    #         'from': _from,
-    #         'value': self.w3.toWei(_value, 'ether')
-    #     }
-    #     return tx
     def createTx(self, _value):
         tx = {
             'gas': GAS,
@@ -133,10 +118,9 @@ class TextImage():
 
     def createContest(self, prize, solution):
         try:
-            tx = self.contract.functions.createContest(solution).buildTransaction(self.createTx(prize))
-            signed_tx = self.w3.eth.account.signTransaction(tx, private_key=self.private_key)
-            self.w3.eth.sendRawTransaction(signed_tx.rawTransaction)
             # self.contract.functions.createContest(solution).transact(self.createTx(self.myAccount, prize))
+            tx = self.contract.functions.createContest(solution).buildTransaction(self.createTx(prize))
+            self.signTxAndWaitNotif(tx)
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
@@ -147,7 +131,9 @@ class TextImage():
 
     def resetContest(self):
         try:
-            self.contract.functions.resetContest().transact(self.createTx(self.myAccount, 0))
+            # self.contract.functions.resetContest().transact(self.createTx(self.myAccount, 0))
+            tx = self.contract.functions.resetContest().buildTransaction(self.createTx(0))
+            self.signTxAndWaitNotif(tx)
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
@@ -156,7 +142,9 @@ class TextImage():
 
     def calculateWinners(self):
         try:
-            self.contract.functions.calculateWinners().transact(self.createTx(self.myAccount, 0))
+            # self.contract.functions.calculateWinners().transact(self.createTx(self.myAccount, 0))
+            tx = self.contract.functions.calculateWinners().buildTransaction(self.createTx(0))
+            self.signTxAndWaitNotif(tx)
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
@@ -165,7 +153,9 @@ class TextImage():
 
     def sendPrizeToWinners(self):
         try:
-            self.contract.functions.sendPrizeToWinners().transact(self.createTx(self.myAccount, 0))
+            # self.contract.functions.sendPrizeToWinners().transact(self.createTx(self.myAccount, 0))
+            tx = self.contract.functions.sendPrizeToWinners().buildTransaction(self.createTx(0))
+            self.signTxAndWaitNotif(tx)
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
@@ -175,9 +165,7 @@ class TextImage():
     def contest(self, solution):
         try:
             tx = self.contract.functions.contest(solution).buildTransaction(self.createTx(0))
-            signed_tx = self.w3.eth.account.signTransaction(tx, private_key=self.private_key)
-            tx_hash = self.w3.eth.sendRawTransaction(signed_tx.rawTransaction)
-            self.Notif.event(tx_hash)
+            self.signTxAndWaitNotif(tx)
         except ValueError as v:
             dict = literal_eval(str(v))
             self.errorNotif.showErrorNotif(str(dict['message']))
@@ -186,3 +174,8 @@ class TextImage():
             print("\tERROR - TextImageContract/contest: \n"+str(v))
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "contest")
+
+    def signTxAndWaitNotif(self, tx):
+        signed_tx = self.w3.eth.account.signTransaction(tx, private_key=self.private_key)
+        tx_hash = self.w3.eth.sendRawTransaction(signed_tx.rawTransaction)
+        self.Notif.event(tx_hash)

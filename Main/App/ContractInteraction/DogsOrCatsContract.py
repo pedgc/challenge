@@ -26,15 +26,10 @@ class DogsOrCats(TextImage):
         self.abi = info_json["abi"]
         # self.w3 = Web3(Web3.HTTPProvider(NODE_HTTP))
         self.w3 = Web3(Web3.WebsocketProvider(NODE_WSS))
-        # self.contract = self.w3.eth.contract(address=CONTRACT_ADDR, abi=abi)
-        # self.myAccount = self.w3.eth.account.from_key(private_key).address
-        # self.errorNotif = ErrorNotification()
-        # self.private_key = 0x0
         self.contract = self.w3.eth.contract(address=CONTRACT_ADDR, abi=self.abi)
         self.private_key = private_key
         self.myAccount = self.w3.eth.account.from_key(private_key).address
-        self.node_http = NODE_HTTP
+        # self.node_http = NODE_HTTP
         self.contract_addr = CONTRACT_ADDR
         self.errorNotif = ErrorNotification()
-        self.Notif = Notification(self) # -> Falta el parametro
-        print("My Address: "+str(self.myAccount))
+        self.Notif = Notification(self)

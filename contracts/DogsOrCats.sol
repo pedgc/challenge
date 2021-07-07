@@ -81,6 +81,7 @@ function getName() public view returns(string memory){
   function calculateWinners() public onlyAdmin{
     require(contesters.length >= 1, "We should have at least 1 contester");
 
+    delete winners;
     uint min = users[contesters[0]];
     uint256 i;
 
