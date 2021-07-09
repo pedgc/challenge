@@ -1,15 +1,13 @@
 from web3 import Web3
 from web3.logs import STRICT, IGNORE, DISCARD, WARN
 import json
-# import random
-# import binascii
 from ContractInteraction import TextImageContract, Notifications
 from TextImageContract import TextImage
 from Notifications import ErrorNotification, Notification
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0xbe503cF43697bD62d2Ef35cf7876A6aE5f652903'
+CONTRACT_ADDR = '0x385137532e5FD26AfBdC090404B48eFaf52a03Bc'
 ABI_JSON = '../build/contracts/DogsOrCats.json'
 # NODE_HTTP = 'http://127.0.0.1:7545' #Ganache
 NODE_HTTP = 'https://ropsten.infura.io/v3/2f93f099906e46a58e16e7d93fa4d2de' #Ropsten HTTP

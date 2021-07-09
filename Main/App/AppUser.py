@@ -4,9 +4,9 @@ from web3.exceptions import ContractLogicError
 from functools import partial
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog as FileDialog
 from ttkbootstrap import Style
 import sys
-# sys.path.insert(0, 'App/ContractInteraction')
 from ContractInteraction import DogsOrCatsContract, TextImageContract, Notifications
 from DogsOrCatsContract import DogsOrCats
 from TextImageContract import TextImage
@@ -87,12 +87,14 @@ class App():
             separ1 = ttk.Separator(contestWindow, orient=HORIZONTAL)
 
             bSend = ttk.Button(contestWindow, text="Send", style="success.TButton", command=partial(self.validateAndContest, contestObject, valueSolution) )
+            bSendFile = ttk.Button(contestWindow, text="Send (File)", style="success.TButton", command=partial(self.validateAndContest, contestObject, withFile=True) )
             bCancel = ttk.Button(contestWindow, text='Cancel', style="secondary.TButton", command=contestWindow.destroy)
 
             labelSolution.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
             valueSolution.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
             separ1.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
             bSend.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
+            bSendFile.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
             bCancel.pack(side=RIGHT, fill=BOTH, expand=True, padx=5, pady=5)
             bCancel.focus_set()
 
@@ -100,17 +102,33 @@ class App():
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "Contest")
 
-    def validateAndContest(self, contestObject, valueSolution):
+    def validateAndContest(self, contestObject, valueSolution="", withFile=False):
         try:
-            print("validateAndContest:")
-            if (type(contestObject) is TextImage):
+            fileHasBeenRead = False
+            if (withFile):
+                filePath = FileDialog.askopenfilename(title="Select file")
+                if(filePath):
+                    file = open(filePath, "r")
+                    valueSolution = file.read()
+                    fileHasBeenRead = True
+                    file.close()
+
+            if (withFile):
+                if(fileHasBeenRead):
+                    if (type(contestObject) is TextImage):
+                        contestObject.createContest(valueSolution)
+                    elif (type(contestObject) is DogsOrCats):
+                        solution = valueSolution.get().split(',')
+                        solution = list(map(int, solution))
+                        contestObject.createContest(solution)
+            elif (type(contestObject) is TextImage):
                 if (isinstance(valueSolution.get(), str)):
-                    contestObject.contest(str(valueSolution.get()))
+                    contestObject.createContest(str(valueSolution.get()))
             elif (type(contestObject) is DogsOrCats):
                 if (isinstance(valueSolution.get(), str)):
                     solution = valueSolution.get().split(',')
                     solution = list(map(int, solution))
-                    contestObject.contest(solution)
+                    contestObject.createContest(solution)
         except ValueError as v:
             self.errorNotif.showErrorNotif(error)
         except Exception as e:

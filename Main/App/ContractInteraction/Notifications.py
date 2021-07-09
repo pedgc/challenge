@@ -82,7 +82,7 @@ class ErrorNotification():
     def __init__(self):
         pass
 
-    def showErrorNotif(self, error):
+    def showErrorNotif(self, error, f_name):
         if "replacement transaction" in error:
             error = "Please check if you have any pending transactions. If not, wait a few moments and try again.\n"
             url = "https://ropsten.etherscan.io/address/"+str(self.myAccount)

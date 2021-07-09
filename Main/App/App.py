@@ -5,6 +5,7 @@ from functools import partial
 from tkinter import *
 from tkinter import ttk
 from ttkbootstrap import Style
+from tkinter import filedialog as FileDialog
 from ContractInteraction import DogsOrCatsContract, TextImageContract, Notifications
 from DogsOrCatsContract import DogsOrCats
 from TextImageContract import TextImage
@@ -36,12 +37,11 @@ class App():
         self.binfo_text = ttk.Button(self.innerFrame1_text, text='Info', style="info.Outline.TButton", command=partial(self.info, textImage))
         self.bSetContest_text = ttk.Button(self.innerFrame1_text, text='Set Contest', command=partial(self.setContest, textImage))
         self.bResetContest_text = ttk.Button(self.innerFrame1_text, text='Reset Contest', style="primary.TButton", command=textImage.resetContest)
-        self.bSetAdmin_text = ttk.Button(self.innerFrame1_text, text='Set Contract Admin', command=partial(self.setAddress, textImage))
         self.bCalculateWinners_text = ttk.Button(self.innerFrame1_text, text='Calculate Winner/s', command=textImage.calculateWinners)
         self.bSendPrize_text = ttk.Button(self.innerFrame1_text, text='Send Prize', style="primary.TButton", command=textImage.sendPrizeToWinners)
         self.innerFrame2_text = ttk.Frame(self.textFrame)
         self.bExpelWinner_text = ttk.Button(self.innerFrame2_text, text='Expel Winner', style="warning.TButton", command=textImage.sendPrizeToWinners)
-        self.bSetAdmin_text = ttk.Button(self.innerFrame2_text, text='Set New Admin', style="danger.TButton", command=textImage.sendPrizeToWinners)
+        self.bSetAdmin_text = ttk.Button(self.innerFrame2_text, text='Set New Admin', style="danger.TButton", command=partial(self.setAdmin, textImage))
 
         # Dog Or Cat Contest Buttons
         self.DoCFrame = ttk.LabelFrame(self.root, text=' Dog or Cat ')
@@ -49,13 +49,12 @@ class App():
         self.binfo_DoC = ttk.Button(self.innerFrame1_DoC, text='Info', style="info.Outline.TButton", command=partial(self.info, dogsOrCats))
         self.bSetContest_DoC = ttk.Button(self.innerFrame1_DoC, text='Set Contest', command=partial(self.setContest, dogsOrCats))
         self.bResetContest_DoC = ttk.Button(self.innerFrame1_DoC, text='Reset Contest', command=dogsOrCats.resetContest)
-        self.bSetAdmin_DoC = ttk.Button(self.innerFrame1_DoC, text='Set Contract Admin', command=partial(self.setAddress, dogsOrCats))
         self.bCalculateWinners_DoC = ttk.Button(self.innerFrame1_DoC, text='Calculate Winner/s', command=dogsOrCats.calculateWinners)
         self.bSendPrize_DoC = ttk.Button(self.innerFrame1_DoC, text='Send Prize', command=dogsOrCats.sendPrizeToWinners)
         self.innerFrame2_DoC = ttk.Frame(self.DoCFrame)
         self.separator3 = ttk.Separator(self.root, orient=HORIZONTAL)
         self.bExpelWinner_DoC = ttk.Button(self.innerFrame2_DoC, text='Expel Winner', style="warning.TButton", command=dogsOrCats.sendPrizeToWinners)
-        self.bSetAdmin_DoC = ttk.Button(self.innerFrame2_DoC, text='Set New Admin', style="danger.TButton", command=dogsOrCats.sendPrizeToWinners)
+        self.bSetAdmin_DoC = ttk.Button(self.innerFrame2_DoC, text='Set New Admin', style="danger.TButton", command=partial(self.setAdmin, dogsOrCats))
 
         # Exit Button
         self.bExit = ttk.Button(self.root, text='Exit', style="secondary.TButton", command=self.root.destroy)
@@ -113,7 +112,8 @@ class App():
             valueSolution = ttk.Entry(setContestWindow, width=30)
             separ1 = ttk.Separator(setContestWindow, orient=HORIZONTAL)
 
-            bCreate = ttk.Button(setContestWindow, text="Create", style="success.TButton", command=partial(self.validateAndCreate, contestObject, prize, valueSolution) )
+            bCreate = ttk.Button(setContestWindow, text="Create", style="success.TButton", command=partial(self.validateAndCreate, contestObject, valuePrize, valueSolution=valueSolution, withFile=False) )
+            bCreateFile = ttk.Button(setContestWindow, text="Create (File)", style="success.TButton", command=partial(self.validateAndCreate, contestObject, valuePrize, valueSolution="", withFile=True) )
             bCancel = ttk.Button(setContestWindow, text='Cancel', style="secondary.TButton", command=setContestWindow.destroy)
 
             labelPrize.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
@@ -121,8 +121,9 @@ class App():
             labelSolution.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
             valueSolution.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
             separ1.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
-            bCreate.pack(side=LEFT, fill=BOTH, expand=True, padx=5, pady=5)
-            bCancel.pack(side=RIGHT, fill=BOTH, expand=True, padx=5, pady=5)
+            bCreate.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=5)
+            bCreateFile.pack(side=LEFT, fill=BOTH, expand=True, padx=2, pady=5)
+            bCancel.pack(side=RIGHT, fill=BOTH, expand=True, padx=2, pady=5)
             bCancel.focus_set()
 
             self.root.wait_window(setContestWindow)
@@ -130,7 +131,7 @@ class App():
             self.errorNotif.showUnexpErrorNotif(e, "setContest")
 
     # Set Contract Admin Address Window
-    def setAddress(self, contestObject):
+    def setAdmin(self, contestObject):
         try:
             setAddressWindow = Toplevel()
             setAddressWindow.geometry('300x120')
@@ -144,8 +145,8 @@ class App():
             valueAddress = ttk.Entry(setAddressWindow, width=30)
             separ1 = ttk.Separator(setAddressWindow, orient=HORIZONTAL)
 
-            bChange = ttk.Button(setAddressWindow, text="Change Address", command=lambda : contestObject.setAdmin(valueAddress.get()))
-            bCancel = ttk.Button(setAddressWindow, text='Cancel', command=setAddressWindow.destroy)
+            bChange = ttk.Button(setAddressWindow, text="Change Admin", style="warning.TButton", command=lambda : contestObject.setAdmin(valueAddress.get()))
+            bCancel = ttk.Button(setAddressWindow, text='Cancel', style="secondary.TButton", command=setAddressWindow.destroy)
 
             labelAddress.pack(side=TOP, fill=BOTH, expand=True, padx=5, pady=5)
             valueAddress.pack(side=TOP, fill=X, expand=True, padx=5, pady=5)
@@ -158,22 +159,38 @@ class App():
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "setAddress")
 
-    def validateAndCreate(self, contestObject, prize, valueSolution):
+    def validateAndCreate(self, contestObject, prize, valueSolution="", withFile=False):
         try:
-            if (isinstance(prize.get(), float)):
-                if (isinstance(contestObject, TextImage)):
-                    if (isinstance(valueSolution.get(), str)):
-                        contestObject.createContest(prize.get(), str(valueSolution.get()))
-                elif (isinstance(contestObject, DogsOrCats)):
-                    if (isinstance(valueSolution.get(), str)):
+            fileHasBeenRead = False
+            if (withFile):
+                filePath = FileDialog.askopenfilename(title="Select file")
+                print("\tfileHasBeenRead (1): "+str(fileHasBeenRead))
+                if(filePath):
+                    file = open(filePath, "r")
+                    valueSolution = file.read()
+                    fileHasBeenRead = True
+                    file.close()
+                    print("\tfileHasBeenRead (2): "+str(fileHasBeenRead))
+                    if (type(contestObject) is TextImage):
+                        contestObject.createContest(prize.get(), valueSolution)
+                    elif (type(contestObject) is DogsOrCats):
                         solution = valueSolution.get().split(',')
                         solution = list(map(int, solution))
                         contestObject.createContest(prize.get(), solution)
+
+            elif (type(contestObject) is TextImage):
+                if (isinstance(valueSolution.get(), str)):
+                    contestObject.createContest(prize.get(), str(valueSolution.get()))
+            elif (type(contestObject) is DogsOrCats):
+                if (isinstance(valueSolution.get(), str)):
+                    solution = valueSolution.get().split(',')
+                    solution = list(map(int, solution))
+                    contestObject.createContest(prize.get(), solution)
         except ValueError as v:
-            error = "Incorrect Solution Format: "+str(v)
             self.errorNotif.showErrorNotif(error)
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "validateAndCreate")
+            print(e)
 
 
     def info(self, contestObject):
