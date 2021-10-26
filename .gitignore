@@ -1,4 +1,4 @@
-/test/tkinterTutorial/*
+/test/*
 *pycache*
 MetaMaskPK.txt
-askForETH
+askForETH.py

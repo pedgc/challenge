@@ -105,6 +105,7 @@ class App():
     def validateAndContest(self, contestObject, valueSolution="", withFile=False):
         try:
             fileHasBeenRead = False
+            print("valueSolution: "+str(valueSolution.get()))
             if (withFile):
                 filePath = FileDialog.askopenfilename(title="Select file")
                 if(filePath):
@@ -116,19 +117,21 @@ class App():
             if (withFile):
                 if(fileHasBeenRead):
                     if (type(contestObject) is TextImage):
-                        contestObject.createContest(valueSolution)
+                        contestObject.contest(valueSolution)
                     elif (type(contestObject) is DogsOrCats):
                         solution = valueSolution.get().split(',')
                         solution = list(map(int, solution))
-                        contestObject.createContest(solution)
+                        contestObject.contest(solution)
             elif (type(contestObject) is TextImage):
                 if (isinstance(valueSolution.get(), str)):
-                    contestObject.createContest(str(valueSolution.get()))
+                    print("Es TextImage")
+                    contestObject.contest(str(valueSolution.get()))
             elif (type(contestObject) is DogsOrCats):
                 if (isinstance(valueSolution.get(), str)):
+                    print("Es DogsOrCats")
                     solution = valueSolution.get().split(',')
                     solution = list(map(int, solution))
-                    contestObject.createContest(solution)
+                    contestObject.contest(solution)
         except ValueError as v:
             self.errorNotif.showErrorNotif(error)
         except Exception as e:

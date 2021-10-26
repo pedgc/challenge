@@ -7,7 +7,7 @@ from Notifications import ErrorNotification, Notification
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0x385137532e5FD26AfBdC090404B48eFaf52a03Bc'
+CONTRACT_ADDR = '0x37DB6815d62fCE57D7A356D9A19F3951ECf329C9'
 ABI_JSON = '../build/contracts/DogsOrCats.json'
 # NODE_HTTP = 'http://127.0.0.1:7545' #Ganache
 NODE_HTTP = 'https://ropsten.infura.io/v3/2f93f099906e46a58e16e7d93fa4d2de' #Ropsten HTTP

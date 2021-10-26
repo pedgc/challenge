@@ -11,7 +11,7 @@ from Notifications import ErrorNotification, Notification
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
-CONTRACT_ADDR = '0xF37c0390a9e84CE281985841E8e2fce4fb0a9812'
+CONTRACT_ADDR = '0x9f5fBF4f53AD9c0bf46C56415E1FA9895b4BDf5C'
 ABI_JSON = '../build/contracts/TextImage.json'
 # NODE_HTTP = 'http://127.0.0.1:7545' #Ganache
 NODE_HTTP = 'https://ropsten.infura.io/v3/2f93f099906e46a58e16e7d93fa4d2de' #Ropsten HTTP
