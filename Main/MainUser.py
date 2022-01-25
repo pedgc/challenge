@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import asyncio
 from colorama import Fore, Back, init
 import sys
 sys.path.insert(0, 'App')
@@ -21,10 +21,10 @@ def main():
     # - - - Pretty Print - - -
     init(autoreset=True)
     print(Back.GREEN +"\n")
+    print(Fore.BLUE + "The program started correctly")
 
     #- - - - - Launch GUI - - - - -
     privKey = Authentication().obtainPrivateKey()
-    print("Private Key: "+str(privKey))
     textimage = TextImage(privKey)
     dogorcat = DogsOrCats(privKey)
     privKey = 0x0

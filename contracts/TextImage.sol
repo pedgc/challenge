@@ -1,18 +1,17 @@
-pragma solidity ^0.5.0;
+pragma solidity >=0.5.0 <0.9.0;
 
 contract TextImage {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
-  //State variables -> Permanently saved in the contract
-  string private solution;
-  address private admin;
-  address payable[] private winners;
-  address payable[] private contesters;
-  uint public prize;
-  bool public status;
-  bool public prizeHasBeenSent;
-  string public name;
-  mapping(address => uint256) public users;
+  string private solution;                    // Correct answer of the contest
+  address private admin;                      // Address of the contract Owner
+  address payable[] private winners;          // List of the winners of the contest
+  address payable[] private contesters;       // List of the contesters
+  uint private prize;                         // Prize amount (in Wei)
+  bool private status;                        // The contest is Active or Inactive
+  bool private prizeHasBeenSent;              // To check if the prize has been sent to winners
+  string private name;                        // Contest name
+  mapping(address => uint256) private users;  // All users of all contests
 
   constructor () public{
     admin = msg.sender;
@@ -35,15 +34,10 @@ function setAdmin(address _newAdmin) public onlyAdmin{
   admin = _newAdmin;
   emit Notification("The admin has been changed correctly", msg.sender);
 }
-function setName(string memory _name) public onlyAdmin{
-  name = _name;
-  emit Notification("The name has been changed correctly", msg.sender);
-}
-
 function getSolution() public view onlyAdmin returns(string memory){
   return solution;
 }
-function getWinners() public view onlyAdmin returns(address payable[] memory){
+function getWinners() public view returns(address payable[] memory){
   return winners;
 }
 function getAdmin() public view returns(address){
@@ -66,9 +60,9 @@ function getName() public view returns(string memory){
 }
 
 // - - - - - Admin - - - - -
-
   function createContest(string memory _solution) public payable onlyAdmin{
     require(msg.value > 0, "Prize can not be 0");
+    require(!status, "You can not create a contest while there is an ongoing one");
 
     solution = _solution;
     status = true;
@@ -80,6 +74,7 @@ function getName() public view returns(string memory){
   function calculateWinners() public onlyAdmin{
     require(contesters.length >= 1, "We should have at least 1 contester");
 
+    delete winners;
     uint min = users[contesters[0]];
     uint256 i;
 
@@ -115,7 +110,24 @@ function getName() public view returns(string memory){
     emit Notification("The prize has been sent to the winner/s", msg.sender);
   }
 
-  // - - - - - - - Reset Contest - - - - - - - -
+  function expelWinner(address _winner) public onlyAdmin{
+    require(winners.length >= 1, "We should have at least 1 winner");
+    require(prizeHasBeenSent == false, "Too late, the prize has already been sent");
+
+    uint i;
+    bool flag = true;
+
+    for(i = 0; (i < winners.length) && flag; i++){
+      if(winners[i] == _winner) {
+        delete winners[i];
+        winners[i] = winners[winners.length - 1];
+        winners.length--;
+        flag = false;
+        emit Notification("The winner has been expelled", msg.sender);
+      }
+    }
+  }
+
   function resetContest() public onlyAdmin{
     require(prizeHasBeenSent == true, "You can not reset the contest without sending prize to winner/s");
 
@@ -129,10 +141,10 @@ function getName() public view returns(string memory){
     emit Notification("The contest has been reset correctly", msg.sender);
   }
 
-
-// - - - - Participants - - - -
+// - - - - Contesters - - - -
   function contest(string memory _resul) public{
     require(msg.sender != admin, "Admin is not allowed to be a contester");
+    require(winners.length == 0, "Contest period is over. Winners have been selected");
     require(status, "The contest is not active");
 
     users[msg.sender] = obtainScore(_resul, solution);
@@ -143,12 +155,17 @@ function getName() public view returns(string memory){
     emit Notification("Your solution has been sent", msg.sender);
   }
 
-  //Explain about levehnstein distance
+  // The lower the score, the better:
+  // To obtain the score, the 'Levenshtein distance' algorithm is used. It obtains
+  // the minimum number of modifications that must be made to a chain so that it
+  // is equal to the other. Solidity limitations:
+  //   1. The maximun length can not be variable. In this scenario -> 200 characters
+  //   2. As we are comparing bytes (not characters), just 32B characters are allowed
   function obtainScore(string memory _str1, string memory _str2) private pure returns(uint256){
     uint length1 = bytes(_str1).length;
     uint length2 = bytes(_str2).length;
     uint n = max(length1, length2) + 1;
-    uint[20][] memory distance = new uint[20][](n);
+    uint[200][] memory distance = new uint[200][](n);
     bytes memory str1 = bytes(_str1);
     bytes memory str2 = bytes(_str2);
 
