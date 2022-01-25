@@ -105,7 +105,7 @@ class App():
     def validateAndContest(self, contestObject, valueSolution="", withFile=False):
         try:
             fileHasBeenRead = False
-            print("valueSolution: "+str(valueSolution.get()))
+            # print("valueSolution: "+str(valueSolution.get()))
             if (withFile):
                 filePath = FileDialog.askopenfilename(title="Select file")
                 if(filePath):

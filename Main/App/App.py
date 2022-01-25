@@ -12,7 +12,7 @@ from TextImageContract import TextImage
 from Notifications import Notification, ErrorNotification
 import os
 CWD = os.getcwd()
-L_PATH = CWD + '/App/Icons/App_Logo.png'
+L_PATH = CWD + '/App/Icons/AppMain_Logo.png'
 
 class App():
     def __init__(self, textImage, dogsOrCats):
