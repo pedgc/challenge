@@ -1,4 +1,4 @@
-/test/*
+Main/test*/
 *pycache*
 MetaMaskPK.txt
 askForETH.py

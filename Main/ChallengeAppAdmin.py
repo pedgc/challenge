@@ -5,7 +5,7 @@ from colorama import Fore, Back, init
 import sys
 sys.path.insert(0, 'App')
 sys.path.insert(0, 'App/ContractInteraction')
-from App import App
+from AppAdmin import App
 from Auth import Authentication
 from ContractInteraction import DogsOrCatsContract, TextImageContract, Notifications
 from DogsOrCatsContract import DogsOrCats
