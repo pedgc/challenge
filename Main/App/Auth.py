@@ -45,6 +45,8 @@ class Authentication():
             # self.root.iconbitmap('App/Icons/App_Logo.ico')
 
             resul = hex(int("0x"+privateKey.get(), 16))
+        except ValueError as e:
+            pass
         except Exception as e:
             self.errorNotif.showUnexpErrorNotif(e, "obtainPrivateKey")
 

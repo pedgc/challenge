@@ -1,13 +1,16 @@
 from web3 import Web3
-import time
-# import asyncio
 from web3.exceptions import ContractLogicError
 from web3.logs import STRICT, IGNORE, DISCARD, WARN
+from ContractInteraction import Notifications
+from Notifications import ErrorNotification, Notification
+from colorama import Fore
+import time
 import json
 import os
 from ast import literal_eval
-from ContractInteraction import Notifications
-from Notifications import ErrorNotification, Notification
+
+#- - - - Pretty Print variables - - - -
+BLUE = Fore.BLUE
 
 #= = = = = = GLOBAL VARIABLES = = = = = =
 POLL_INTERVAL = 2
@@ -16,8 +19,8 @@ ABI_JSON = '../build/contracts/TextImage.json'
 # NODE_HTTP = 'http://127.0.0.1:7545' #Ganache
 NODE_HTTP = 'https://ropsten.infura.io/v3/2f93f099906e46a58e16e7d93fa4d2de' #Ropsten HTTP
 NODE_WSS = 'wss://ropsten.infura.io/ws/v3/2f93f099906e46a58e16e7d93fa4d2de' #Ropsten websocket
-GAS = 210000   #Wei
-GAS_PRICE = 4  #GWei
+GAS = 300000    #Wei
+# GAS_PRICE = 100 #GWei
 
 
 class TextImage():
@@ -35,7 +38,10 @@ class TextImage():
         self.contract_addr = CONTRACT_ADDR
         self.errorNotif = ErrorNotification()
         self.Notif = Notification(self)
-        print("My Address: "+str(self.myAccount))
+        self.GAS_PRICE = self.w3.eth.gas_price
+        print(BLUE + "Using:\n\tWeb3 Version: "+str(self.w3.api) + "\n\tClient Version: "+str(self.w3.clientVersion))
+        print(BLUE + "My Address: "+str(self.myAccount))
+        print(BLUE + "Current Gas Price: "+str(self.w3.fromWei(self.GAS_PRICE, 'GWei')) + " GWei")
 
     # - - - - - - Getters & Setters - - - - - - - -
     def getSolution(self):
@@ -105,13 +111,23 @@ class TextImage():
     # - - - - - - - - Methods - - - - - - - -
     def createTx(self, _value):
         tx = {
-            'gas': GAS,
-            'gasPrice': self.w3.toWei(GAS_PRICE, 'GWei'),
+            'gas': self.w3.toWei(GAS, 'Wei'),
+            'gasPrice': self.GAS_PRICE,
             'nonce': self.w3.eth.getTransactionCount(self.myAccount),
             'from': str(self.myAccount),
             'value': self.w3.toWei(_value, 'ether')
         }
         return tx
+
+    # def createTx(self, _value):
+    #     tx = {
+    #         'maxFeePerGas': '0x'+str(self.w3.toWei(250, 'gwei')),
+    #         'maxPriorityFeePerGas': '0x'+str(self.w3.toWei(2, 'gwei')),
+    #         'nonce': self.w3.eth.getTransactionCount(self.myAccount),
+    #         'from': str(self.myAccount),
+    #         'value': self.w3.toWei(_value, 'ether')
+    #     }
+    #     return tx
 
     def createContest(self, prize, solution):
         try:

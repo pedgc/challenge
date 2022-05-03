@@ -124,11 +124,9 @@ class App():
                         contestObject.contest(solution)
             elif (type(contestObject) is TextImage):
                 if (isinstance(valueSolution.get(), str)):
-                    print("Es TextImage")
                     contestObject.contest(str(valueSolution.get()))
             elif (type(contestObject) is DogsOrCats):
                 if (isinstance(valueSolution.get(), str)):
-                    print("Es DogsOrCats")
                     solution = valueSolution.get().split(',')
                     solution = list(map(int, solution))
                     contestObject.contest(solution)
