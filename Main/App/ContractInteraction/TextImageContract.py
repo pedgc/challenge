@@ -40,7 +40,7 @@ class TextImage():
         self.Notif = Notification(self)
         self.GAS_PRICE = self.w3.eth.gas_price
         print(BLUE + "Using:\n\tWeb3 Version: "+str(self.w3.api) + "\n\tClient Version: "+str(self.w3.clientVersion))
-        print(BLUE + "My Address: "+str(self.myAccount))
+        print(BLUE + "My Address: https://ropsten.etherscan.io/address/"+str(self.myAccount))
         print(BLUE + "Current Gas Price: "+str(self.w3.fromWei(self.GAS_PRICE, 'GWei')) + " GWei")
 
     # - - - - - - Getters & Setters - - - - - - - -
