@@ -12,7 +12,7 @@ ABI_JSON = '../build/contracts/DogsOrCats.json'
 # NODE_HTTP = 'http://127.0.0.1:7545' #Ganache
 NODE_HTTP = 'https://ropsten.infura.io/v3/2f93f099906e46a58e16e7d93fa4d2de' #Ropsten HTTP
 NODE_WSS = 'wss://ropsten.infura.io/ws/v3/2f93f099906e46a58e16e7d93fa4d2de' #Ropsten websocket
-GAS = 300000   #Wei
+GAS = 2000000   #Wei
 # GAS_PRICE = 4  #GWei
 
 

@@ -50,10 +50,11 @@ class Notification():
         while event_received == False:
             try:
                 tx_receipt = self.w3.eth.get_transaction_receipt(tx_hash)
+                url = "https://ropsten.etherscan.io/tx/"+str(tx_receipt['transactionHash'].hex())
                 event = self.contract.events.Notification().processReceipt(tx_receipt)
                 if (event):
                     event_received = True
-                    message = str(event[0]['args']['_notif'])
+                    message = str(event[0]['args']['_notif']) + "\nYou can check the Tx here: "+url
                     notification.notify(
                         title='Notification',
                         message=message,
@@ -63,7 +64,7 @@ class Notification():
                     print(OK+message)
                 else:
                     event_received = True
-                    url = "https://ropsten.etherscan.io/tx/"+str(tx_receipt['transactionHash'].hex())
+                    # url = "https://ropsten.etherscan.io/tx/"+str(tx_receipt['transactionHash'].hex())
                     message = "The transaction was reverted. Check the reason here:\t\n"+url
                     notification.notify(
                         title='Notification',

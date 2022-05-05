@@ -1,4 +1,7 @@
 Main/test*/
+Main/App/ContractInteraction/__pycache__/*pyc
+Main/App/test/__pycache__/*pyc
+Main/App/__pycache__/*pyc
 *pycache*
 MetaMaskPK.txt
 askForETH.py
