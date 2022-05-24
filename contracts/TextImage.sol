@@ -4,13 +4,13 @@ contract TextImage {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
   string private solution;                    // Correct answer of the contest
+  string private name;                        // Contest name
   address private admin;                      // Address of the contract Owner
   address payable[] private winners;          // List of the winners of the contest
   address payable[] private contesters;       // List of the contesters
   uint private prize;                         // Prize amount (in Wei)
   bool private status;                        // The contest is Active or Inactive
   bool private prizeHasBeenSent;              // To check if the prize has been sent to winners
-  string private name;                        // Contest name
   mapping(address => uint256) private users;  // All users of all contests
 
   constructor () public{

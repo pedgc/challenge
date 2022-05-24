@@ -4,10 +4,10 @@ contract DogsOrCats {
 
   /* = = = = = = = VARIABLES & CONSTRUCTOR = = = = = = =*/
   uint[] private solution;                    // Correct answer of the contest
+  uint private prize;                         // Prize amount (in Wei)
   address private admin;                      // Address of the contract Owner
   address payable[] private winners;          // List of the winners of the contest
   address payable[] private contesters;       // List of the contesters
-  uint private prize;                         // Prize amount (in Wei)
   bool private status;                        // The contest is Active or Inactive
   bool private prizeHasBeenSent;              // To check if the prize has been sent to winners
   string private name;                        // Contest name
@@ -30,12 +30,11 @@ contract DogsOrCats {
   event Notification(string _notif, address _sender);
 
 /* = = = = = = = FUNCTIONS = = = = = = = */
-// - - - - Getters & Setters - - - -
+// - - - - Getters & Setters- - - -
 function setAdmin(address _newAdmin) public onlyAdmin{
   admin = _newAdmin;
   emit Notification("The admin has been changed correctly", msg.sender);
 }
-
 
 function getSolution() public view onlyAdmin returns(uint[] memory){
   return solution;
@@ -62,8 +61,7 @@ function getName() public view returns(string memory){
   return name;
 }
 
-// - - - - - Admin - - - - -
-
+// - - - - - Admin Functions - - - - -
   function createContest(uint[] memory _solution) public payable onlyAdmin{
     require(msg.value > 0, "Prize can not be 0");
     require(!status, "You can not create a contest while there is an ongoing one");
@@ -95,7 +93,6 @@ function getName() public view returns(string memory){
           winners.push(contesters[i]);
       }
     }
-
     emit Notification("The winner/s has/have been calculated correctly", msg.sender);
   }
 
@@ -146,8 +143,7 @@ function getName() public view returns(string memory){
     emit Notification("The contest has been reset correctly", msg.sender);
   }
 
-
-// - - - - Contesters - - - -
+// - - - - Contesters Functions - - - -
   function contest(uint[] memory _resul) public{
     require(msg.sender != admin, "Admin is not allowed to be a contester");
     require(winners.length == 0, "Contest period is over. Winners have been selected");
@@ -158,7 +154,6 @@ function getName() public view returns(string memory){
     if(isFirstAttempt(msg.sender)){
       contesters.push(msg.sender);
     }
-
     emit Notification("Your solution has been sent", msg.sender);
   }
 
@@ -172,7 +167,6 @@ function getName() public view returns(string memory){
         score++;
       }
     }
-
     return score;
   }
 
@@ -184,8 +178,6 @@ function getName() public view returns(string memory){
         resul = false;
       }
     }
-
     return resul;
   }
-
 }
